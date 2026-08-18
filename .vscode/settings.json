@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^npm run dev -- --host 0\\.0\\.0\\.0$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python - <<'PY'\nimport os, time\nroot='\\.'\nfiles=\\[\\]\nfor dirpath, dirnames, filenames in os\\.walk\\(root\\):\n    dirnames\\[:\\] = \\[d for d in dirnames if d not in \\{'node_modules','\\.git','dist'\\}\\]\n    for f in filenames:\n        p=os\\.path\\.join\\(dirpath,f\\)\n        try:\n            st=os\\.stat\\(p\\)\n        except FileNotFoundError:\n            continue\n        files\\.append\\(\\(st\\.st_mtime,p\\)\\)\nfor _,p in sorted\\(files, reverse=True\\)\\[:30\\]:\n    print\\(time\\.strftime\\('%Y-%m-%d %H:%M:%S', time\\.localtime\\(os\\.path\\.getmtime\\(p\\)\\)\\), p\\[2:\\]\\)\nPY$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
