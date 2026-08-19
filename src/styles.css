@@ -1,0 +1,1619 @@
+:root {
+  font-family: "Usual", "Avenir Next", "Segoe UI", sans-serif;
+  color: #121c25;
+  background: #fff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --ink: #121c25;
+  --profile-ink: #0b131a;
+  --highlight: #ed4d33;
+  --card: #e9eaeb;
+  --soft-card: #f2f4f5;
+  /* Figma "Main Navigation" = 44px status bar + 48px nav row */
+  --nav-height: 92px;
+  /* Figma 1h "Navigation Bar" = 44px status bar + 44px title row */
+  --catalogue-nav-height: 88px;
+  /* Sheet starts at 59px, so the fixed dark bar stops exactly there. */
+  --help-nav-height: 59px;
+  /* Figma typography tokens */
+  --heading-size: 18px;
+  --heading-weight: 600;
+  --heading-line-height: 1.2;
+  --heading-letter-spacing: -1px;
+  --body-size: 16px;
+  --body-weight: 400;
+  --body-line-height: 1.5;
+  --button-size: 16px;
+  --button-weight: 600;
+  --button-line-height: 24px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background: #fff;
+}
+
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  min-width: 320px;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-shell {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: #fff;
+}
+
+.flow-chooser-hotspot {
+  position: fixed;
+  z-index: 90;
+  top: 0;
+  left: 50%;
+  width: min(100%, 520px);
+  height: 44px;
+  transform: translateX(-50%);
+  background: transparent;
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  /* Clip sideways only. Clipping vertically would cut off content on short
+     devices with no way to scroll to it. */
+  overflow-x: hidden;
+  background: #fff;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.icon-button img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fixed chrome: the status bar and the nav row below it never scroll —
+   page content passes underneath them. */
+.top-navigation {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
+  background: #fff;
+}
+
+.status-bar {
+  height: 44px;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  color: #000;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.status-bar-light {
+  color: #fff;
+}
+
+.status-bar-light .status-icons img {
+  filter: invert(1);
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.status-icons img:nth-child(1) {
+  width: 19px;
+  height: 12px;
+}
+
+.status-icons img:nth-child(2) {
+  width: 17px;
+  height: 12px;
+}
+
+.status-icons img:nth-child(3) {
+  width: 27px;
+  height: 13px;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 24px;
+}
+
+.back-button {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.nav-title {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  font-family: inherit;
+  font-size: var(--heading-size);
+  font-weight: var(--heading-weight);
+  line-height: var(--heading-line-height);
+  letter-spacing: var(--heading-letter-spacing);
+}
+
+.home-bar {
+  position: fixed;
+  z-index: 30;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+  height: 34px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.home-bar span {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 134px;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 100px;
+  background: #121c25;
+}
+
+.fit-test-design-screen {
+  min-height: 100dvh;
+  padding-top: 92px;
+}
+
+.fit-test-nav {
+  position: fixed;
+  z-index: 20;
+  inset: 0 0 auto;
+  height: 92px;
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(32px);
+}
+
+.fit-test-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+}
+
+.fit-test-nav-row h1 {
+  flex: 1;
+  color: #0b131a;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.18px;
+  text-align: center;
+}
+
+.fit-test-nav-spacer { width: 24px; height: 24px; }
+
+.fit-test-visual {
+  position: relative;
+  height: 281px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.fit-test-line-set {
+  position: absolute;
+  inset: -240px -390px -360px -120px;
+  width: auto;
+  height: auto;
+}
+
+.fit-test-earbud-crop {
+  position: absolute;
+  width: 116px;
+  height: 110px;
+  left: 48px;
+  top: 103px;
+  transform: rotate(86deg) scaleY(-1);
+  overflow: hidden;
+}
+
+.fit-test-earbud-crop img {
+  position: absolute;
+  width: 202px;
+  height: 202px;
+  left: -105px;
+  top: -46px;
+  max-width: none;
+}
+
+.fit-test-copy {
+  width: 335px;
+  margin: 32px auto 0;
+  text-align: center;
+}
+
+.fit-test-copy h2 {
+  color: #121c25;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.fit-test-copy p {
+  margin-top: 22px;
+  color: #0b131a;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.fit-test-bottom {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0 24px;
+}
+
+.fit-test-next {
+  display: block;
+  width: 100%;
+  height: 64px;
+  border: 0;
+  border-radius: 30px;
+  background: #ed4d33;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.fit-test-bottom .home-bar {
+  position: relative;
+  height: 34px;
+  width: 100%;
+}
+
+.fit-test-export-screen {
+  position: relative;
+  width: 375px;
+  height: 100dvh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.fit-test-export-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 375px;
+  height: 812px;
+}
+
+.fit-test-export-back,
+.fit-test-export-next {
+  position: absolute;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.fit-test-rebuilt-screen {
+  width: 100%;
+  min-height: 100dvh;
+  background: #fff;
+}
+
+.fit-test-rebuilt-nav {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 92px;
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(32px);
+}
+
+.fit-test-rebuilt-status { height: 44px; }
+
+.fit-test-rebuilt-title-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 24px;
+  align-items: center;
+  height: 48px;
+  padding: 0 24px;
+}
+
+.fit-test-rebuilt-title-row h1 {
+  color: #0b131a;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.18px;
+  text-align: center;
+}
+
+.fit-test-rebuilt-back {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.fit-test-rebuilt-back img { display: block; width: 24px; height: 24px; }
+
+.fit-test-rebuilt-visual {
+  position: relative;
+  width: 376px;
+  height: 281px;
+  margin: 110px auto 0;
+  overflow: hidden;
+}
+
+.fit-test-rebuilt-lines {
+  position: absolute;
+  inset: -366px -392px -543px -120px;
+  width: auto;
+  height: auto;
+  max-width: none;
+}
+
+.fit-test-rebuilt-earbud {
+  position: absolute;
+  left: 47px;
+  top: 103px;
+  width: 94px;
+  height: 110px;
+  overflow: hidden;
+  transform: rotate(86.02deg) scaleY(-1);
+}
+
+.fit-test-rebuilt-earbud img {
+  position: absolute;
+  left: -105px;
+  top: -46px;
+  width: 202px;
+  height: 202px;
+  max-width: none;
+}
+
+.fit-test-rebuilt-copy {
+  width: 335px;
+  margin: 32px auto 0;
+  text-align: center;
+}
+
+.fit-test-rebuilt-copy h2 {
+  color: #121c25;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.fit-test-rebuilt-copy p {
+  margin-top: 22px;
+  color: #0b131a;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.fit-test-rebuilt-bottom {
+  position: fixed;
+  z-index: 21;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0 24px;
+  background: #fff;
+}
+
+.fit-test-rebuilt-bottom button {
+  display: block;
+  width: 100%;
+  height: 64px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 30px;
+  background: #ed4d33;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.fit-test-rebuilt-home {
+  position: relative;
+  width: 100%;
+  height: 34px;
+}
+
+.fit-test-rebuilt-home::after {
+  content: "";
+  position: absolute;
+  right: 50%;
+  bottom: 8px;
+  width: 134px;
+  height: 5px;
+  border-radius: 100px;
+  background: #121c25;
+  transform: translateX(50%);
+}
+
+.fit-test-export-back {
+  top: 44px;
+  left: 0;
+  width: 72px;
+  height: 48px;
+}
+
+.fit-test-export-next {
+  right: 24px;
+  bottom: 34px;
+  left: 24px;
+  height: 64px;
+}
+
+.catalogue-screen {
+  min-height: max(100dvh, 923px);
+  padding-top: var(--catalogue-nav-height);
+  padding-bottom: 56px;
+}
+
+/* Whole top block — status bar through the "..." button — is fixed and opaque. */
+.catalogue-nav {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--catalogue-nav-height);
+  background: #fff;
+}
+
+.catalogue-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 44px;
+  padding: 0 16px;
+}
+
+.more-button {
+  width: 24px;
+  height: 24px;
+}
+
+.catalogue-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 24px;
+}
+
+.intro-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.intro-copy h1,
+.search-copy h1,
+.setup-copy h1 {
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.intro-copy p,
+.search-copy p,
+.setup-copy p {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 116px;
+  padding: 8px 16px 8px 24px;
+  border: 0;
+  border-radius: 48px;
+  color: var(--ink);
+  background: var(--soft-card);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.product-row:active {
+  transform: scale(0.985);
+  background: #e9ebed;
+}
+
+.product-row:focus-visible,
+.button:focus-visible,
+.icon-button:focus-visible,
+.ios-row:focus-visible {
+  outline: 3px solid rgba(7, 134, 252, 0.55);
+  outline-offset: 2px;
+}
+
+.product-row > span {
+  flex: 1;
+  padding-right: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.product-thumb {
+  position: relative;
+  flex: 0 0 70px;
+  width: 70px;
+  height: 100px;
+  overflow: hidden;
+}
+
+.product-thumb.single-image img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+}
+
+.product-thumb.pro-pair img,
+.product-thumb.perl-pair img {
+  position: absolute;
+  width: 37px;
+  height: 37px;
+  object-fit: contain;
+}
+
+.product-thumb.pro-pair img:first-child {
+  top: 25px;
+  left: 0;
+}
+
+.product-thumb.pro-pair img:last-child {
+  top: 45px;
+  left: 34px;
+}
+
+.product-thumb.perl-pair img:first-child {
+  top: 27px;
+  left: 0;
+}
+
+.product-thumb.perl-pair img:last-child {
+  top: 44px;
+  left: 35px;
+}
+
+.product-thumb.stem-pair img {
+  position: absolute;
+  width: 38px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.product-thumb.stem-pair img:first-child {
+  top: 10px;
+  left: 0;
+}
+
+.product-thumb.stem-pair img:last-child {
+  top: 32px;
+  left: 34px;
+}
+
+.product-thumb.stem-pair.compact img {
+  width: 34px;
+}
+
+.toast {
+  position: fixed;
+  z-index: 50;
+  bottom: 44px;
+  left: 50%;
+  width: min(327px, calc(100% - 48px));
+  padding: 13px 18px;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 16px;
+  color: #fff;
+  background: rgba(18, 28, 37, 0.94);
+  box-shadow: 0 10px 30px rgba(18, 28, 37, 0.2);
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+/* Screens that use TopNavigation reserve its height so nothing starts
+   underneath the fixed header. */
+.search-screen,
+.found-screen,
+.setup-screen,
+.fit-buds-screen,
+.fit-screen {
+  padding-top: var(--nav-height);
+}
+
+.search-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  padding: 24px 20px 190px;
+}
+
+.search-visual {
+  position: relative;
+  flex: 0 0 280px;
+  width: 280px;
+  height: 280px;
+}
+
+.search-visual img {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  /* Fluid so the rings still fit a 320pt screen. */
+  width: min(327px, 87vw);
+  height: auto;
+  aspect-ratio: 327 / 343;
+  transform: translateX(-50%);
+}
+
+.search-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+}
+
+.search-actions {
+  position: absolute;
+  bottom: 34px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 0 24px;
+}
+
+.search-actions.not-found-actions {
+  gap: 0;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 0;
+  color: var(--highlight);
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.button-outline {
+  height: 64px;
+  padding: 12px 20px;
+  border: 1px solid var(--highlight);
+  border-radius: 30px;
+  background: #fff;
+}
+
+.button-text {
+  height: 48px;
+  padding: 8px 24px;
+  border-radius: 32px;
+}
+
+.button-primary {
+  height: 64px;
+  padding: 12px 20px;
+  border-radius: 30px;
+  color: #fff;
+  background: var(--highlight);
+}
+
+.help-screen {
+  background: #121c25;
+}
+
+.help-backdrop {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--help-nav-height);
+  background: #121c25;
+}
+
+.help-sheet {
+  position: absolute;
+  top: 59px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  min-height: 753px;
+  padding-top: 16px;
+  border-radius: 24px 24px 0 0;
+  background: #fff;
+}
+
+.grabber {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 36px;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: rgba(60, 60, 67, 0.3);
+}
+
+.help-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 60px;
+  padding: 8px 24px;
+}
+
+.help-title h1 {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.18px;
+}
+
+.close-button {
+  width: 28px;
+  height: 28px;
+}
+
+.help-visual {
+  display: block;
+  width: calc(100% - 48px);
+  height: 300px;
+  margin: 0 24px;
+  border-radius: 24px;
+}
+
+.media-swap {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+/* Figma centres the media inside a clipping frame and lets it bleed past the
+   edges, i.e. an aspect-preserving centre crop. */
+.media-placeholder,
+.media-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  transform: translate(-50%, -50%);
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+.media-video {
+  z-index: 1;
+  opacity: 0;
+}
+
+.media-swap.is-playing .media-video {
+  opacity: 1;
+}
+
+.help-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  color: var(--profile-ink);
+}
+
+.help-copy h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.18px;
+}
+
+.help-copy p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.help-actions {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  bottom: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 0 24px;
+  background: #fff;
+}
+
+.found-screen {
+  min-height: 100dvh;
+  padding-bottom: 34px;
+  background: #f9f9f9;
+  overflow: visible;
+}
+
+.found-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 24px 34px;
+}
+
+.found-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 40px;
+  color: var(--profile-ink);
+  background: var(--card);
+}
+
+/* Figma asset frame is 295x330; keep that ratio at any device width so the
+   artwork scales with the card instead of shrinking inside a wider box. */
+.found-image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 295 / 330;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+/* Both product shots are square (1024x1024) source renders, so height stays
+   auto — the intrinsic ratio is preserved and the artwork can never stretch.
+   Widths are the Figma leaf widths as a share of the 295px frame. */
+.found-image-wrap img {
+  display: block;
+  flex: none;
+  height: auto;
+  max-width: none;
+  object-fit: contain;
+}
+
+/* 315 / 295 */
+.found-image-wrap .found-white {
+  width: 106.78%;
+}
+
+/* 354 / 295 */
+.found-image-wrap .found-black {
+  width: 120%;
+}
+
+.found-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.found-copy h2 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.found-copy p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.setup-screen {
+  min-height: 100dvh;
+  background: #f9f9f9;
+}
+
+.setup-shell {
+  padding: 3.5px 24px 34px;
+}
+
+.setup-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: calc(100dvh - 130px);
+  padding: 16px;
+  overflow: hidden;
+  border-radius: 40px;
+  color: var(--profile-ink);
+  background: var(--card);
+}
+
+/* Figma asset frame is 295x469. Holding that ratio on every device keeps the
+   media crop identical to the design instead of widening with the viewport;
+   any spare card height is absorbed above the copy, not by the image. */
+.setup-visual {
+  position: relative;
+  display: block;
+  flex: 0 1 auto;
+  width: 100%;
+  aspect-ratio: 295 / 469;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+/* preparing.png is an exact 295x469 export of the Figma asset frame, so it is
+   shown whole (contain) rather than cropped — the card grows with the viewport
+   and cover would zoom into the product. */
+.setup-placeholder-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 50%;
+}
+
+/* Copy + button stay anchored to the bottom of the card; slack sits under the
+   image, matching the Figma stack. */
+.setup-copy {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.setup-button {
+  flex: 0 0 64px;
+}
+
+.fit-buds-screen {
+  min-height: 100dvh;
+  background: #fff;
+}
+
+/* Figma 5b-2: asset 342x400 at y=108, copy 342x165, bottom wrapper at y=666
+   (64px button + 48px text button + 34px home bar). The asset holds its ratio
+   so the buttons stay on screen instead of being pushed past the fold. */
+.fit-buds-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 24px 34px;
+  height: calc(100dvh - var(--nav-height));
+}
+
+.fit-buds-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 auto;
+  width: 100%;
+  aspect-ratio: 342 / 400;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fit-buds-visual img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: 50% 50%;
+}
+
+.fit-buds-copy {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.fit-buds-copy h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.fit-buds-copy p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  color: #666;
+}
+
+/* ---------------------------------------------------------------------------
+   Fit test flow (Figma 11a-N). Frame 375x812: title row 48px under the 92px
+   nav, body text 335 wide at x=20, actions pinned to the 698px bottom wrapper.
+   --------------------------------------------------------------------------- */
+
+.fit-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding-bottom: 34px;
+  background: #fff;
+}
+
+/* Secondary section title within fit test screens. Used for subtitles below the main nav title. */
+.fit-section-title {
+  width: 100%;
+  margin: 16px 0 0;
+  font-family: "Usual", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  text-align: center;
+  color: var(--ink);
+}
+
+.fit-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  min-height: 0;
+}
+
+/* Figma Paragraph 1: 16px, 400 weight, 1.5 line height. */
+.fit-paragraph {
+  width: 100%;
+  max-width: 335px;
+  margin: 0;
+  font-family: "Usual", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  color: #4a5560;
+}
+
+.fit-paragraph-tight {
+  display: block;
+  max-width: 375px;
+  margin-top: 20px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0 20px;
+  text-align: center !important;
+  color: #0b131a;
+}
+
+.fit-heading {
+  margin: 0;
+  font-family: "Usual", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* Placeholder frame for the fit-test animation asset. */
+.fit-asset-box {
+  width: 100%;
+  max-width: 335px;
+  aspect-ratio: 335 / 200;
+  border-radius: 24px;
+  background: var(--card);
+}
+
+/* Figma 11a-5a "Frame 25" is a full-bleed 375x281 illustration, so it breaks
+   out of the 20px body padding rather than sitting inside it. */
+.fit-mesh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% + 40px);
+  max-width: none;
+  margin: 0 -20px;
+  aspect-ratio: 375 / 281;
+}
+
+.fit-mesh img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Actions sit in the Figma bottom wrapper: 327-wide buttons, 16px gap. */
+.fit-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px;
+}
+
+/* Figma "Fit - Test Buds", 223x120 with L/R captions. */
+.fit-buds-graphic {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  max-width: 254px;
+}
+
+.fit-bud-labels,
+.fit-seal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  width: 100%;
+}
+
+.fit-bud-labels span {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Figma "Fit - Test Buds" is a single 223x120 export containing both buds,
+   so it renders as one image rather than a two-column grid. */
+.fit-bud-images {
+  width: 100%;
+  aspect-ratio: 223 / 120;
+}
+
+.fit-bud-images img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 50%;
+}
+
+.fit-seal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.42857;
+}
+
+.fit-seal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid currentcolor;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.fit-seal-good {
+  color: #1f9d55;
+}
+
+.fit-seal-bad {
+  color: var(--highlight);
+}
+
+.noise-status {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f9d55;
+}
+
+.noise-status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid currentcolor;
+  border-radius: 50%;
+}
+
+/* Checking-the-fit progress, Figma track 295x3. */
+.fit-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 327px;
+}
+
+.fit-progress p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Progress bar animates from 0 to 100% over 3.5 seconds. */
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.fit-progress-track {
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: #d7dbdf;
+  overflow: hidden;
+}
+
+.fit-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ink);
+  animation: progress-fill 3.5s ease forwards;
+}
+
+.fit-result-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 335px;
+  text-align: center;
+}
+
+.fit-result-copy h1 {
+  margin: 0;
+  font-family: "Usual", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.fit-result-copy p {
+  margin: 0;
+  font-family: "Usual", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #4a5560;
+}
+
+/* Ear tip list, Figma rows 375x48. */
+.ear-tip-list {
+  flex: 1 1 auto;
+  width: 100%;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.ear-tip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 48px;
+  padding: 0 24px;
+  border: 0;
+  background: none;
+  font-family: "Usual", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: left;
+  color: #0b131a;
+  cursor: pointer;
+}
+
+.ear-tip-check {
+  display: block;
+  width: 24px;
+  height: 24px;
+  padding: 6.65px 4.52px;
+  object-fit: fill;
+}
+
+/* iOS-style popup, Figma 335x223 at y=294.5. */
+.fit-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 40;
+  width: calc(100% - 40px);
+  max-width: 335px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  transform: translate(-50%, -50%);
+}
+
+.fit-popup-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  border-bottom: 1px solid #e6e8ea;
+}
+
+.fit-popup-title h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.fit-popup-body {
+  padding: 20px;
+}
+
+.fit-popup-body p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  color: #4a5560;
+}
+
+.fit-popup-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.fit-popup-actions .button {
+  flex: 1 1 0;
+  height: 48px;
+}
+
+.loading-mark {
+  position: relative;
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.loading-ring,
+.loading-sweep,
+.loading-arc {
+  position: absolute;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+}
+
+.loading-ring {
+  top: 0.6285px;
+  left: 0.6285px;
+  width: 26.7429px;
+  height: 26.7429px;
+}
+
+.loading-sweep {
+  inset: 0;
+  animation: loading-sweep 900ms linear infinite;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.loading-arc {
+  top: 9.799px;
+  left: 0.6285px;
+  width: 26.7429px;
+  height: 17.5736px;
+}
+
+@keyframes loading-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sits above the fixed navigation (z-index 20) and the home bar (30), matching
+   Figma where the shade dims the whole screen including the status bar. */
+.shade {
+  position: absolute;
+  z-index: 35;
+  inset: 0;
+  background: rgba(18, 28, 37, 0.35);
+}
+
+.ios-alert {
+  position: absolute;
+  z-index: 36;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: 270px;
+  min-height: 236px;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+  border-radius: 14px;
+  background: rgba(242, 242, 242, 0.97);
+  backdrop-filter: blur(27px);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+.ios-alert h2 {
+  display: grid;
+  place-items: center;
+  height: 60px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+}
+
+.ios-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 44px;
+  padding: 0 18.5px;
+  border: 0;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.36);
+  color: var(--ink);
+  background: #fff;
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+}
+
+button.ios-row {
+  cursor: pointer;
+}
+
+.ios-cancel {
+  justify-content: center;
+  color: #007aff;
+  background: rgba(242, 242, 242, 0.97);
+}
+
+@media (max-height: 760px) {
+  .help-screen {
+    overflow-y: auto;
+  }
+
+  .help-actions {
+    position: absolute;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-sweep {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Fit test: reason shown when Next is unavailable (buds not detected as worn). */
+.fit-status-note {
+  margin: 0 0 4px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: #00a56d;
+}

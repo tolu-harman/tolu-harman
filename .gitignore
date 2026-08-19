@@ -1,0 +1,6 @@
+.preview-dist/
+.preview-tmp/
+preview.html
+preview-media/
+node_modules/
+.DS_Store

@@ -1,0 +1,871 @@
+/* Styles for the ported hearing-test flow. Values map 1:1 to the RN
+   StyleSheets in the Expo project (lib/theme.ts + per-screen styles). */
+
+.ht-screen {
+  --ht-primary: #ed4d33;
+  --ht-primary-bg: #fdedeb;
+  --ht-ink: #0b131a;
+  --ht-dark: #121c25;
+  --ht-gray20: #f2f4f5;
+  --ht-secondary: #4a545e;
+  --ht-green: #00a56d;
+  --ht-purple: #5857e5;
+  --ht-border: #e4e7e9;
+
+  display: flex;
+  flex-direction: column;
+  /* Must be a viewport length, not 100%: this rule overrides .screen (same
+     specificity, loaded later) and a percentage min-height can't resolve
+     because no ancestor has a definite height — the screen would collapse to
+     its content, which is why the circle stopped short of the bottom. */
+  min-height: 100dvh;
+  background: #fff;
+  color: var(--ht-ink);
+  /* No safe-area padding here: these screens now render the shared StatusBar,
+     which occupies that space the way TopNavigation does elsewhere. */
+}
+
+/* The status bar is a flex child of the screen, so keep it from being
+   squeezed by the content below it. */
+.ht-screen > .status-bar {
+  flex-shrink: 0;
+}
+
+.ht-screen--gray { background: var(--ht-gray20); }
+.ht-screen--off { background: #fafafa; }
+
+/* ── Typography (theme.ts `type`) ─────────────────────────────────────── */
+.ht-h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--ht-ink); }
+.ht-h2 { margin: 0; font-size: 24px; font-weight: 600; color: var(--ht-ink); }
+.ht-h3 { margin: 0; font-size: 18px; font-weight: 600; color: var(--ht-ink); }
+.ht-p1 { margin: 0; font-size: 16px; font-weight: 400; line-height: 24px; color: var(--ht-dark); }
+.ht-p2 { margin: 0; font-size: 14px; font-weight: 400; line-height: 20px; color: var(--ht-secondary); }
+
+.ht-center { text-align: center; }
+.ht-prewrap { white-space: pre-wrap; }
+.ht-mt2 { margin-top: 2px; }
+.ht-mt4 { margin-top: 4px; }
+.ht-mt8 { margin-top: 8px; }
+.ht-mt12 { margin-top: 12px; }
+.ht-mt16 { margin-top: 16px; }
+.ht-mt20 { margin-top: 20px; }
+.ht-mt24 { margin-top: 24px; }
+
+/* ── Header (expo-router Stack) ───────────────────────────────────────── */
+/* Matches Figma "Main Navigation": 44px status bar + 48px title row, 24px
+   side padding, 24px icon — identical to the Denon .nav-row. */
+.ht-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+/* Also used as an empty spacer so the title stays optically centred. */
+.ht-header-back {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ht-ink);
+}
+
+button.ht-header-back { cursor: pointer; }
+.ht-header-back img { display: block; width: 24px; height: 24px; }
+
+.ht-header-title {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ht-ink);
+}
+
+/* ── Layout blocks ────────────────────────────────────────────────────── */
+.ht-content { flex: 1; padding: 16px 24px 0; }
+.ht-top { padding: 20px 24px 0; flex-shrink: 0; }
+/* margin-top:auto pins the actions to the bottom of the screen even when
+   nothing above them flexes (the "Great work" screen has no spacer). Where a
+   flex:1 element already fills the space, this is a no-op. */
+.ht-bottom {
+  margin-top: auto;
+  padding: 0 24px 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+
+/* Test-family screens sit their actions 56px up, matching the pause menu. */
+.ht-bottom--anchored { padding-bottom: clamp(24px, 6.6vh, 56px); }
+.ht-bottom--tight { padding-top: 8px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+
+/* Figma 5.1.B "Test__First-ear--Default" (393x852): the Beep circle is
+   x=32, y=465, 329x329 — so 32px side margins and 852-(465+329) = 58px from
+   the bottom of the screen. Holds that position through the countdown, the
+   trials and the pause. */
+.ht-middle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  /* Figma spacing on a tall phone; tightens rather than pushing the circle
+     off-screen on a short one. */
+  padding-bottom: clamp(24px, 6.8vh, 58px);
+  min-height: 0;
+}
+.ht-middle--center { justify-content: center; }
+.ht-middle-actions { width: 100%; padding: 0 24px; }
+
+.ht-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.ht-scroll--flush { padding: 0; }
+.ht-scroll--pad { padding: 24px; }
+.ht-scroll--profile { padding: 20px 20px 24px; }
+
+/* ── Buttons (PrimaryButton.tsx) ──────────────────────────────────────── */
+.ht-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 56px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 28px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ht-button:active { opacity: 0.8; }
+.ht-button:disabled { opacity: 0.4; }
+
+.ht-button--primary { background: var(--ht-primary); color: #fff; }
+.ht-button--secondary { background: #fff; color: var(--ht-primary); border: 1px solid var(--ht-primary); }
+.ht-button--ghost { background: transparent; color: var(--ht-primary); height: 44px; }
+
+/* ── Intro (index.tsx) ────────────────────────────────────────────────── */
+.ht-blob-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+.ht-blob-wrap svg { max-width: 100%; height: auto; }
+
+/* ── About (about.tsx) ────────────────────────────────────────────────── */
+.ht-bullet { display: flex; margin-top: 20px; padding-right: 8px; }
+.ht-dot { margin-right: 10px; font-size: 16px; line-height: 24px; color: var(--ht-dark); }
+
+/* ── Overview (overview.tsx) ──────────────────────────────────────────── */
+.ht-card--overview { margin: 16px; background: #fff; border-radius: 16px; padding: 20px; }
+.ht-step { display: flex; align-items: center; margin-bottom: 16px; gap: 12px; }
+.ht-step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: var(--ht-gray20);
+  font-weight: 600;
+  color: var(--ht-ink);
+}
+
+/* ── Quiet place (quiet-place.tsx) ────────────────────────────────────── */
+/* Generous on a tall phone, collapses on a short one. */
+.ht-meter-wrap { margin-top: clamp(32px, 14vh, 120px); }
+
+/* ── Device setup (device-setup.tsx) ──────────────────────────────────── */
+.ht-setup-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--ht-gray20);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ht-setup-row .ht-h3 { flex: 1; font-size: 16px; }
+.ht-setup-sub { margin: 6px 4px 0; }
+
+.ht-info-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ht-primary);
+  border-radius: 12px;
+  color: var(--ht-primary);
+  font-weight: 600;
+}
+
+.ht-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: rgba(11, 19, 26, 0.5);
+}
+
+.ht-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 75%;
+  max-height: 92%;
+  padding: 24px;
+  border-radius: 24px 24px 0 0;
+  background: #fff;
+  animation: ht-sheet-up 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes ht-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.ht-sheet-close {
+  align-self: flex-end;
+  padding: 8px;
+  border: 0;
+  background: none;
+  font-size: 20px;
+  color: var(--ht-ink);
+  cursor: pointer;
+}
+
+.ht-sheet-body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Hold circle (HoldCircle.tsx) ─────────────────────────────────────── */
+.ht-hold {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 32px side margins per Figma; 329px is the design width at 393pt, so the
+     cap keeps it from growing beyond spec on wider screens. */
+  width: min(329px, calc(100% - 64px));
+  aspect-ratio: 1;
+  border: 1.5px solid var(--ht-primary);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ht-primary);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  transition: background-color 90ms ease, color 90ms ease;
+}
+
+.ht-hold.is-pressed { background: var(--ht-primary); color: #fff; }
+
+/* Countdown and paused states: same circle, not pressable, label swapped. */
+.ht-hold.is-inert {
+  cursor: default;
+  background: #fff;
+  color: var(--ht-primary);
+  opacity: 1; /* disabled, but must not look dimmed */
+}
+
+/* ── Ear test (test/[ear].tsx) ────────────────────────────────────────── */
+/* Figma "Progress": full width, 8px, directly under the title row. */
+.ht-progress-track {
+  height: 8px;
+  background: #c9ced2;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.ht-progress-track span {
+  display: block;
+  height: 100%;
+  background: var(--ht-primary);
+  transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pause / resume, right side of the test header. */
+.ht-pause {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ht-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ht-pause:active { opacity: 0.6; }
+
+/* ── Results (results.tsx) ────────────────────────────────────────────── */
+.ht-results-header { padding: 16px 24px 0; }
+.ht-cap-row { display: flex; gap: 12px; padding: 0 24px; margin-top: 20px; }
+
+.ht-cap-card { flex: 1; background: var(--ht-gray20); border-radius: 20px; padding: 18px; }
+.ht-cap-pct { margin: 12px 0 0; font-size: 30px; font-weight: 700; color: var(--ht-ink); }
+.ht-cap-track {
+  height: 6px;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: #dde0e3;
+  overflow: hidden;
+}
+.ht-cap-track span { display: block; height: 6px; border-radius: 3px; }
+
+.ht-chart-section {
+  margin-top: 24px;
+  padding: 20px 16px;
+  background: #f7f7f8;
+}
+
+.ht-chips { display: flex; gap: 8px; }
+.ht-chip {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--ht-border);
+  border-radius: 20px;
+  background: #fff;
+  opacity: 0.45;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ht-ink);
+  cursor: pointer;
+}
+.ht-chip.is-active { border-color: #f5c4bb; background: var(--ht-primary-bg); opacity: 1; }
+.ht-chip-dot { width: 8px; height: 8px; border-radius: 4px; margin-right: 8px; }
+
+.ht-more-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 24px;
+  padding: 18px;
+  border: 0;
+  border-radius: 28px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ht-more-label { flex: 1; font-size: 16px; line-height: 24px; color: var(--ht-dark); }
+.ht-info-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ht-ink);
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ht-ink);
+}
+.ht-chevron { font-size: 18px; color: var(--ht-ink); }
+
+/* ── Chart (HearingChart.tsx) ─────────────────────────────────────────── */
+.ht-chart-row { display: flex; }
+.ht-chart-svg { max-width: 100%; }
+.ht-chart-y {
+  width: 64px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+.ht-chart-band { margin: 0; font-size: 12px; line-height: 16px; color: var(--ht-dark); }
+.ht-chart-band-sub { margin: 0; font-size: 10px; line-height: 14px; color: #9aa1a7; }
+.ht-chart-x {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--ht-secondary);
+}
+.ht-chart-x.is-inset { padding-left: 64px; }
+
+/* ── Cards (more-info.tsx / profile.tsx) ──────────────────────────────── */
+.ht-card { background: var(--ht-gray20); border-radius: 16px; padding: 16px; }
+.ht-scroll--pad .ht-card { border-radius: 16px; padding: 20px; }
+.ht-card-title { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: var(--ht-ink); }
+
+/* ── Profile (profile.tsx) ────────────────────────────────────────────── */
+.ht-row-between { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+.ht-viz-toast {
+  position: absolute;
+  top: 8px;
+  right: 20px;
+  z-index: 20;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: rgba(11, 19, 26, 0.85);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ht-switch {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: #c9ced2;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+.ht-switch.is-on { background: var(--ht-ink); }
+.ht-switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 200ms ease;
+}
+.ht-switch.is-on span { transform: translateX(20px); }
+
+.ht-segmented {
+  display: flex;
+  margin-top: 16px;
+  padding: 4px;
+  border-radius: 28px;
+  background: #fff;
+}
+.ht-segment {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  border: 0;
+  border-radius: 24px;
+  background: none;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+.ht-segment.is-active { background: var(--ht-primary); }
+
+.ht-segment-labels { display: flex; margin-top: 8px; }
+.ht-segment-labels span {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--ht-secondary);
+}
+.ht-segment-labels span.is-active { color: var(--ht-ink); font-weight: 600; }
+
+.ht-print { opacity: 0; transform: scale(0.85); transition: opacity 700ms ease, transform 700ms ease; }
+.ht-print.is-in { opacity: 1; transform: scale(1); }
+
+.ht-print-legend {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 6px;
+}
+.ht-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #5b5f66;
+}
+.ht-legend-dot { width: 9px; height: 9px; border-radius: 4.5px; }
+
+.ht-play-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 16px;
+  padding: 20px 22px;
+  border: 0;
+  border-radius: 22px;
+  background: #16181d;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.ht-play-bar:active { transform: scale(0.96); }
+.ht-play-copy { display: flex; flex-direction: column; flex: 1; }
+.ht-play-title { font-size: 18px; font-weight: 700; color: #fff; }
+.ht-play-sub { margin-top: 3px; font-size: 14.5px; color: #a7abb2; }
+.ht-play-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 26px;
+  background: #fce4dc;
+}
+
+.ht-results-card {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 16px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--ht-gray20);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ht-results-card-sub { display: block; margin: 6px 0 12px; }
+
+.ht-tabbar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 8px 24px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--ht-border);
+  background: #fff;
+}
+.ht-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 18px;
+  border-radius: 24px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ht-tab.is-active {
+  flex-direction: row;
+  gap: 6px;
+  padding: 10px 18px;
+  background: var(--ht-ink);
+}
+.ht-tab-icon { font-size: 18px; color: var(--ht-ink); }
+.ht-tab-label { margin-top: 2px; font-size: 11px; color: var(--ht-ink); }
+.ht-tab.is-active .ht-tab-icon,
+.ht-tab.is-active .ht-tab-label { color: #fff; margin-top: 0; }
+
+/* Figma Nav-bar 1545:71022 */
+.ht-figma-nav {
+  position: fixed;
+  z-index: 25;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 114px;
+  padding: 0 8px;
+  border-radius: 40px 40px 0 0;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 -20px 15px rgba(145, 145, 145, .1);
+  backdrop-filter: blur(10px);
+}
+
+.ht-figma-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  overflow: hidden;
+}
+
+.ht-figma-nav-item {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  padding-bottom: 4px;
+  color: #171a20;
+  font-family: "Usual", sans-serif;
+  font-size: 14px;
+  line-height: normal;
+  opacity: .87;
+  user-select: none;
+}
+
+.ht-figma-nav-item > img,
+.ht-figma-settings,
+.ht-figma-settings img {
+  width: 24px;
+  height: 24px;
+}
+
+.ht-figma-nav-item > img { object-fit: contain; }
+
+.ht-figma-settings { position: relative; display: block; transform: scale(1.12); }
+.ht-figma-settings img { position: absolute; max-width: none; }
+.ht-figma-settings img:first-child {
+  top: 11.28%;
+  left: 13.45%;
+  width: 78.9%;
+  height: 82.3%;
+}
+.ht-figma-settings img:last-child {
+  top: 33.85%;
+  left: 33.85%;
+  width: 32.3%;
+  height: 32.3%;
+}
+
+.ht-figma-nav-item.is-active {
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 4px;
+  border-radius: 40px;
+  background: #121c25;
+  color: #fff;
+  opacity: 1;
+}
+
+.ht-figma-nav-item.is-active > img { filter: brightness(0) invert(1); }
+
+.ht-figma-home-indicator {
+  position: relative;
+  height: 34px;
+}
+
+.ht-figma-home-indicator::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 144px;
+  height: 5px;
+  border-radius: 100px;
+  background: #000;
+  transform: translateX(-50%);
+}
+
+.ht-scroll--profile { padding-bottom: 140px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ht-print { transition: none; opacity: 1; transform: none; }
+  .ht-sheet { animation: none; }
+}
+
+/* ── Microphone permission (14b-2a/2b/2c) ─────────────────────────────── */
+.ht-mic-mark {
+  display: flex;
+  justify-content: center;
+  margin-top: 64px;
+}
+
+.ht-mic-caption { margin-top: 16px; }
+
+/* iOS-style system alert, used for the permission prompts. */
+.ht-ios-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.ht-ios-alert {
+  width: 100%;
+  max-width: 270px;
+  border-radius: 14px;
+  background: #f7f7f7;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  animation: ht-alert-in 180ms ease-out;
+}
+
+@keyframes ht-alert-in {
+  from { opacity: 0; transform: scale(1.08); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ht-ios-alert-body { padding: 19px 16px 15px; text-align: center; }
+
+.ht-ios-alert-body h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.29;
+  color: #000;
+}
+
+.ht-ios-alert-body p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.31;
+  color: #000;
+}
+
+.ht-ios-alert-actions {
+  display: flex;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.29);
+}
+
+.ht-ios-alert-actions button {
+  flex: 1;
+  padding: 11px 6px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 17px;
+  color: #007aff;
+  cursor: pointer;
+}
+
+.ht-ios-alert-actions button + button { border-left: 0.5px solid rgba(60, 60, 67, 0.29); }
+.ht-ios-alert-actions button.is-default { font-weight: 600; }
+.ht-ios-alert-actions button.is-destructive { color: #ff3b30; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ht-ios-alert { animation: none; }
+}
+
+/* ── Pause menu (5.1.2.A) ─────────────────────────────────────────────── */
+/* Anchored to the bottom like the Beep circle rather than centred, so the
+   menu sits where the participant's thumb already is. */
+.ht-pause-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(11, 19, 26, 0.45);
+}
+
+.ht-pause-card {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(24px, 6.6vh, 56px);
+  /* Same width rule as the Beep circle: 32px side margins, capped at 329px. */
+  width: min(329px, calc(100% - 64px));
+  padding: 8px 16px 16px;
+  border-radius: 20px;
+  background: #fff;
+  transform: translateX(-50%);
+  animation: ht-pause-in 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes ht-pause-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.ht-pause-item {
+  display: block;
+  width: 100%;
+  padding: 18px 8px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ht-primary);
+  cursor: pointer;
+}
+
+.ht-pause-item:active { opacity: 0.6; }
+
+/* Confirmations stay centred — they're system-style alerts. */
+.ht-pause-alert {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ht-pause-card { animation: none; }
+}
+
+/* ── Practice round (4.1.A–E, 4.2) ────────────────────────────────────── */
+.ht-trial-mark {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--ht-primary);
+}
+
+/* The mark sits above the circle without shifting it. */
+.ht-practice-feedback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 92px;
+  justify-content: flex-end;
+}
+
+.ht-practice-feedback p { margin: 0 0 14px; }
+
+.ht-practice-done { text-align: center; }
+.ht-practice-done .ht-h3 { margin-bottom: 6px; }
+
+/* ── Ambient-noise interruption (5.1.1.G / H) ─────────────────────────── */
+.ht-noise-card {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(24px, 6.6vh, 56px);
+  width: min(329px, calc(100% - 64px));
+  padding: 20px 16px 8px;
+  border-radius: 20px;
+  background: #fff;
+  transform: translateX(-50%);
+  animation: ht-pause-in 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.ht-noise-card-meter { margin-top: 16px; }
+
+.ht-noise-link {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 14px 8px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ht-primary);
+  cursor: pointer;
+}
+
+/* Disabled on the "it's quiet" state — there's nothing to act on. */
+.ht-noise-link:disabled { color: #c9ced2; cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ht-noise-card { animation: none; }
+}

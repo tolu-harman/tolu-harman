@@ -1,0 +1,137 @@
+/* Walkthrough panel — deliberately unlike the app's own styling so it can
+   never be mistaken for product UI. */
+
+.dev-panel-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: rgba(8, 11, 15, 0.55);
+}
+
+.dev-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 88%;
+  border-radius: 18px 18px 0 0;
+  background: #16181d;
+  color: #e8ebef;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.4);
+  animation: dev-panel-up 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes dev-panel-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.dev-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #262a31;
+  flex-shrink: 0;
+}
+
+.dev-panel-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+
+.dev-panel-head button {
+  border: 0;
+  background: none;
+  color: #8b929c;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.dev-panel-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 16px 22px;
+}
+
+.dev-panel-body section { margin-bottom: 18px; }
+
+.dev-panel-label {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #7d858f;
+}
+
+.dev-panel-help { margin: 0 0 8px; font-size: 12px; color: #6d747e; line-height: 1.4; }
+
+/* Scenario chips */
+.dev-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.dev-chip {
+  padding: 7px 11px;
+  border: 1px solid #2f343c;
+  border-radius: 99px;
+  background: #1d2027;
+  color: #cdd3da;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.dev-chip.is-active { background: #ed4d33; border-color: #ed4d33; color: #fff; font-weight: 600; }
+.dev-chip--ghost { background: transparent; color: #7d858f; }
+
+/* Branch segmented controls */
+.dev-seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #1d2027;
+}
+
+.dev-seg-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: #aeb5bd;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.dev-seg-item em { font-style: normal; font-size: 10.5px; color: #6d747e; }
+.dev-seg-item.is-active { background: #333941; color: #fff; font-weight: 600; }
+.dev-seg-item.is-active em { color: #9aa2ac; }
+
+/* Screen jump list */
+.dev-group { margin-top: 10px; }
+.dev-group-title { margin: 0 0 5px; font-size: 11.5px; color: #6d747e; }
+.dev-links { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.dev-link {
+  padding: 6px 10px;
+  border: 1px solid #262a31;
+  border-radius: 7px;
+  background: #1a1d23;
+  color: #c3c9d1;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dev-link:active { background: #262a31; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dev-panel { animation: none; }
+}

@@ -1,0 +1,40 @@
+/* Shared ambient level meter — used by the hearing test's "Find a quiet place"
+   and the Denon "Background noise check". Geometry from the former. */
+
+.level-meter {
+  width: 100%;
+}
+
+.level-meter-bars {
+  display: flex;
+  justify-content: space-between;
+  height: 32px;
+}
+
+.level-meter-bar {
+  width: 3px;
+  border-radius: 1.5px;
+  height: 100%;
+  /* Long enough to read as a level settling rather than bars flicking. */
+  transition: background-color 260ms ease;
+}
+
+.level-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #9aa1a7;
+}
+
+.level-meter-labels span {
+  transition: color 260ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .level-meter-bar,
+  .level-meter-labels span {
+    transition: none;
+  }
+}
