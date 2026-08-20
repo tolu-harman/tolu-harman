@@ -7,7 +7,7 @@ import react from "@vitejs/plugin-react";
 const isPreview = process.env.PREVIEW_BUILD === "1";
 
 export default defineConfig({
-  base: "./",
+  base: isPreview ? "./" : "/tolu-harman/",
   build: isPreview
     ? {
         /* Separate outDir so a preview build can never be mistaken for the
