@@ -23,6 +23,8 @@ import { useTest } from "./TestContext";
 import { colors, effectiveEar, scoreFromHeard, TRIALS } from "./lib";
 import { useBeepTrial } from "./useBeepTrial";
 
+const ASSET = "./assets/";
+
 function todayLabel() {
   return new Date().toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -32,7 +34,7 @@ function todayLabel() {
 }
 
 /* ── index.tsx — intro ────────────────────────────────────────────────── */
-export function HtIntro({ go }) {
+export function HtIntro({ go, back, accentSecond = false, figmaCopy = false }) {
   const { lastTestDate, setLastTestDate } = useTest();
 
   /* Researcher shortcut: skip the whole test flow and land on the results. */
@@ -42,27 +44,60 @@ export function HtIntro({ go }) {
   };
 
   return (
-    <main className="screen ht-screen">
-      <StatusBar />
-      <div className="ht-blob-wrap">
-        <svg width="320" height="320" viewBox="0 0 320 320" aria-hidden="true">
-          <defs>
-            <radialGradient id="ht-blob" cx="40%" cy="35%" r="75%">
-              <stop offset="0%" stopColor="#FFC3A0" />
-              <stop offset="55%" stopColor="#FFA07C" />
-              <stop offset="100%" stopColor="#F5825E" />
-            </radialGradient>
-          </defs>
-          <circle cx="160" cy="160" r="150" fill="url(#ht-blob)" opacity="0.95" />
-        </svg>
+    <main className="screen ht-screen ht-personalise-screen">
+      <HearingHeader title="Personalise sound" onBack={back} />
+      <div className="ht-personalise-visual" aria-hidden="true">
+        <video
+          className="ht-personalise-video"
+          src={`${ASSET}hearing-profile-loop-2.mp4`}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        <img className="ht-personalise-earbud ht-personalise-earbud--left" src={`${ASSET}profile-left-earbud.png`} alt="" />
+        <img className="ht-personalise-earbud ht-personalise-earbud--right" src={`${ASSET}profile-right-earbud.png`} alt="" />
       </div>
-      <div className="ht-bottom">
-        <h1 className="ht-h1">Find Your Sound</h1>
-        <p className="ht-p1 ht-mt8">
-          Discover your personalised sound through a hearing test and enjoy enhanced listening.
-        </p>
-        <PrimaryButton title="Try now" onPress={() => go("ht-about")} className="ht-mt24" />
-        <PrimaryButton title="Next" variant="ghost" onPress={skipToResults} className="ht-mt4" />
+      <div className="ht-personalise-content">
+        <p className="ht-p1">Two quick steps to audio that's tuned to your ears.</p>
+        <div className="ht-personalise-cards">
+          <section className="ht-personalise-card">
+            <div className="ht-personalise-card-title">
+              <span className="ht-step-num">1</span>
+              <h2 className="ht-h3">Fit test</h2>
+            </div>
+            <p className="ht-p1">
+              Find the best fit for your earbuds. A good seal reduces sound leakage and improving
+              your listening experience
+            </p>
+          </section>
+          <section className="ht-personalise-card">
+            <div className="ht-personalise-card-title">
+              <span className={accentSecond ? "ht-step-num" : "ht-step-num ht-step-num--muted"}>2</span>
+              <h2 className="ht-h3">Sound Personalization</h2>
+            </div>
+            {figmaCopy ? (
+              <ul className="ht-personalise-steps">
+                <li>Find a quiet place</li>
+                <li>Take the 4-min hearing test</li>
+                <li>Enjoy sound tuned to you</li>
+              </ul>
+            ) : (
+              <ul className="ht-personalise-steps">
+                <li>Audio is more immersive and dialogue becomes easier to understand.</li>
+                <li>Listen at reduced volume with detail preserved.</li>
+              </ul>
+            )}
+          </section>
+        </div>
+      </div>
+      <div className="ht-personalise-actions">
+        <PrimaryButton
+          title={figmaCopy ? "Personalise your sound" : "Test the fit"}
+          onPress={() => go(figmaCopy ? "ht-mic-prompt" : "fit-intro")}
+        />
+        <PrimaryButton title="Maybe later" variant="ghost" onPress={skipToResults} />
+        <div className="ht-personalise-home" aria-hidden="true"><span /></div>
       </div>
     </main>
   );
@@ -71,9 +106,9 @@ export function HtIntro({ go }) {
 /* ── about.tsx ────────────────────────────────────────────────────────── */
 export function HtAbout({ go, back }) {
   return (
-    <main className="screen ht-screen">
+    <main className="screen ht-screen ht-mic-screen">
       <HearingHeader onBack={back} />
-      <div className="ht-content">
+      <div className="ht-content ht-mic-content">
         <h2 className="ht-h2 ht-center">Sound Personalization</h2>
         <p className="ht-p1 ht-mt16">
           Sound Personalization reveals a unique and enriched audio experience tailored to your
@@ -939,8 +974,9 @@ function MicScreen({ back, children, onAllow }) {
         </div>
         <p className="ht-p1 ht-center ht-mic-caption">Allow microphone access</p>
       </div>
-      <div className="ht-bottom">
+      <div className="ht-bottom ht-mic-bottom">
         <PrimaryButton title="Allow access" onPress={onAllow} />
+        <div className="ht-mic-home" aria-hidden="true"><span /></div>
       </div>
       {children}
     </main>

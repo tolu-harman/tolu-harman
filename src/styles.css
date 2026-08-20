@@ -1363,7 +1363,7 @@ p {
   height: 100%;
   border-radius: 2px;
   background: var(--ink);
-  animation: progress-fill 3.5s ease forwards;
+  transition: width 100ms linear;
 }
 
 .fit-result-copy {

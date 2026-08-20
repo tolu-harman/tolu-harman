@@ -768,40 +768,75 @@ function EarTipsScreen({ onBack, onDone, title }) {
 
 /* 11a-7 / 11a-8a — checking the fit, progress. */
 function CheckingFitScreen({ onBack, onCancel, onFinished, progress = 0.08, status }) {
-  const [animatedProgress, setAnimatedProgress] = useState(0.08);
+  const [animatedProgress, setAnimatedProgress] = useState(0);
 
   useEffect(() => {
     const tone = new Audio(`${ASSET}fit-test-tone.mp4`);
-    tone.loop = true;
+    tone.loop = false;
     tone.preload = "auto";
+    let playbackStarted = false;
+    let playbackFailed = false;
 
     // This screen is entered from a user action in the flow, so start the
     // tone immediately. If a browser blocks autoplay, the check still runs
     // and the audio element is cleaned up when the screen ends.
-    tone.play().catch(() => {});
+    tone.play().then(() => {
+      playbackStarted = true;
+    }).catch(() => {
+      playbackFailed = true;
+    });
 
-    // Animate from current progress to 100% over 3 seconds
+    // Animate progress across the full tone duration.
     const startTime = Date.now();
-    const duration = 3200;
+    // The supplied fit-test tone is 10 seconds long. The screen must remain
+    // visible until the complete tone has played before advancing.
+    const duration = 10000;
     let frame;
+    let finished = false;
+    let fallbackTimer;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      setAnimatedProgress(1);
+      tone.pause();
+      tone.currentTime = 0;
+      onFinished();
+    };
+
+    const syncToAudio = () => {
+      const audioDuration = Number.isFinite(tone.duration) && tone.duration > 0
+        ? tone.duration
+        : duration / 1000;
+      setAnimatedProgress(Math.min(tone.currentTime / audioDuration, 1));
+    };
+
+    tone.addEventListener("loadedmetadata", syncToAudio);
+    tone.addEventListener("timeupdate", syncToAudio);
+    tone.addEventListener("ended", finish);
+    fallbackTimer = window.setTimeout(finish, duration + 250);
 
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const newProgress = Math.min(elapsed / duration, 1);
-      setAnimatedProgress(newProgress);
+      // During normal playback, the audio timeupdate event is the source of
+      // truth. Only use the timer if playback is blocked by the browser.
+      if (playbackFailed) setAnimatedProgress(newProgress);
 
       if (newProgress < 1) {
         frame = requestAnimationFrame(animate);
       } else {
-        tone.pause();
-        tone.currentTime = 0;
-        onFinished();
+        finish();
       }
     };
 
     frame = requestAnimationFrame(animate);
     return () => {
       cancelAnimationFrame(frame);
+      window.clearTimeout(fallbackTimer);
+      tone.removeEventListener("loadedmetadata", syncToAudio);
+      tone.removeEventListener("timeupdate", syncToAudio);
+      tone.removeEventListener("ended", finish);
       tone.pause();
       tone.currentTime = 0;
       tone.src = "";
@@ -992,13 +1027,7 @@ function App() {
       case "complete":
         return <CompleteScreen onBack={goBack} onNext={() => pushScreen("fit-buds")} />;
       case "fit-buds":
-        return (
-          <FitBudsScreen
-            onBack={goBack}
-            onTryNow={() => pushScreen("fit-intro")}
-            onNext={() => replaceScreen("catalogue", 0)}
-          />
-        );
+        return <HtIntro go={htGo} back={goBack} />;
       case "fit-intro":
         return <FigmaFitTestScreen onBack={goBack} onNext={() => pushScreen("noise-measuring")} />;
       case "noise-measuring":
@@ -1109,7 +1138,7 @@ function App() {
 
       /* ── Hearing test flow (ported from hearing-test-app) ───────────── */
       case "ht-intro":
-        return <HtIntro go={htGo} />;
+        return <HtIntro go={htGo} back={goBack} accentSecond figmaCopy />;
       case "ht-about":
         return <HtAbout go={htGo} back={goBack} />;
       case "ht-overview":
