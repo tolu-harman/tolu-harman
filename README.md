@@ -68,3 +68,12 @@ participant is waiting to *hear* something first.
 
 Source art was 29.6MB; the shipped set is 2.3MB (some images were 2233×3864 for
 a 38pt display size). Originals are kept in `assets-original/`.
+
+## GitHub Pages
+
+The production site is published at
+<https://tolu-harman.github.io/tolu-harman/>.
+
+Pushes to `main` run the GitHub Pages deployment workflow. Before the first
+deployment, set **Settings** > **Pages** > **Build and deployment** > **Source**
+to **GitHub Actions**.
