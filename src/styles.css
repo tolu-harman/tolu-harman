@@ -757,7 +757,7 @@ p {
 }
 
 .search-wave img {
-  filter: saturate(1.65);
+  filter: saturate(3) contrast(1.15);
 }
 
 .search-wave-1 {
@@ -785,7 +785,7 @@ p {
     transform: scale(0.78);
   }
   12% {
-    opacity: 0.9;
+    opacity: 1;
   }
   72% {
     opacity: 0.16;
