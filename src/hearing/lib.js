@@ -22,20 +22,20 @@ export const colors = {
 
 /* The four audiometric bands. Tones are synthesised at these frequencies (see
    useBeepTrial), so the bundled tone wavs are no longer needed. */
-export const TONE_FREQS = [500, 1000, 2000, 4000];
+export const TONE_FREQS = [250, 500, 1000, 2000, 3000, 4000, 6000, 8000];
 export const TONE_DURATION_MS = 1200;
 
 /* Each trial: a frequency and a volume. Heard/not-heard per trial builds the
    profile. */
 export const TRIALS = [
+  { freq: 250, volume: 1 },
   { freq: 500, volume: 1 },
-  { freq: 500, volume: 0.25 },
   { freq: 1000, volume: 1 },
-  { freq: 1000, volume: 0.25 },
   { freq: 2000, volume: 1 },
-  { freq: 2000, volume: 0.25 },
+  { freq: 3000, volume: 1 },
   { freq: 4000, volume: 1 },
-  { freq: 4000, volume: 0.25 },
+  { freq: 6000, volume: 1 },
+  { freq: 8000, volume: 1 },
 ];
 
 /* Convert heard flags into a score per frequency band (0..1, higher = better). */

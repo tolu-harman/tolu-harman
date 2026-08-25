@@ -57,11 +57,11 @@ export const BRANCHES = [
 ];
 
 export const DEFAULT_CONFIG = {
-  search: "auto",
+  search: "found",
   mic: "prompt",
   noise: "good",
   fit: "good",
-  practice: "live",
+  practice: "pass",
 };
 
 /* Named runs, for jumping straight into a scenario. */

@@ -75,6 +75,45 @@ function armUnlock() {
 armUnlock();
 
 export function useBeepTrial() {
+  const startContinuousBeep = useCallback((freq, volume) => {
+    const c = createCtx();
+    if (!c) return () => {};
+    if (c.state === "suspended") c.resume().catch(() => {});
+    try {
+      const t0 = c.currentTime;
+      const osc = c.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t0);
+      const gain = c.createGain();
+      gain.gain.setValueAtTime(0, t0);
+      gain.gain.linearRampToValueAtTime(TONE_PEAK * volume, t0 + RAMP_S);
+      osc.connect(gain).connect(c.destination);
+      osc.start(t0);
+      let stopped = false;
+      let fading = false;
+      return (fadeMs = 1200) => {
+        if (stopped) return;
+        const stopAt = c.currentTime;
+        gain.gain.cancelScheduledValues(stopAt);
+        /* The first call fades on press. A subsequent call, used on release,
+           cancels that fade and stops this oscillator before the next trial. */
+        if (fadeMs === 0 || fading) {
+          stopped = true;
+          gain.gain.setValueAtTime(0, stopAt);
+          try { osc.stop(stopAt); } catch {}
+          return;
+        }
+        fading = true;
+        gain.gain.setValueAtTime(gain.gain.value, stopAt);
+        const fadeSeconds = Math.max(RAMP_S, fadeMs / 1000);
+        gain.gain.linearRampToValueAtTime(0, stopAt + fadeSeconds);
+        osc.stop(stopAt + fadeSeconds);
+      };
+    } catch {
+      return () => {};
+    }
+  }, []);
+
   const playBeep = useCallback(
     (freq, volume) =>
       new Promise((resolve) => {
@@ -111,5 +150,5 @@ export function useBeepTrial() {
     []
   );
 
-  return { playBeep, audioReady: !!ctx && ctx.state === "running" };
+  return { playBeep, startContinuousBeep, audioReady: !!ctx && ctx.state === "running" };
 }

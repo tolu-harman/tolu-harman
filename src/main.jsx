@@ -32,41 +32,21 @@ const FIGMA_EAR_TIP_CHECK = `${ASSET}figma-ear-tip-check.svg`;
 
 const catalogueProducts = [
   {
-    name: "Denon PerL 2",
+    name: "Denon buds",
     image: "perl2-list-white.png",
     imageClass: "single-image",
     enabled: true,
-  },
-  {
-    name: "Denon PerL Pro",
-    pair: ["perl-pro-left.png", "perl-pro-right.png"],
-    imageClass: "pro-pair",
-  },
-  {
-    name: "Denon PerL",
-    pair: ["perl-left.png", "perl-right.png"],
-    imageClass: "perl-pair",
-  },
-  {
-    name: "Denon AH-C840NCW",
-    pair: ["c840-left.png", "c840-right.png"],
-    imageClass: "stem-pair",
-  },
-  {
-    name: "Denon AH-C500W",
-    pair: ["c500-left.png", "c500-right.png"],
-    imageClass: "stem-pair compact",
   },
 ];
 
 const foundProducts = [
   {
-    name: "Denon PerL 2 White",
+    name: "Denon buds White",
     image: "found-white.png",
     imageClass: "found-white",
   },
   {
-    name: "Denon PerL 2 Black",
+    name: "Denon buds Black",
     image: "found-black.png",
     imageClass: "found-black",
   },
@@ -224,7 +204,7 @@ function CatalogueScreen({ onSelect }) {
                 if (product.enabled) {
                   onSelect();
                 } else {
-                  setNotice("This prototype flow is available for Denon PerL 2.");
+                  setNotice("This prototype flow is available for Denon buds.");
                 }
               }}
               aria-label={`Connect ${product.name}`}
@@ -248,11 +228,21 @@ function CatalogueScreen({ onSelect }) {
 
 function SearchVisual({ failed = false }) {
   return (
-    <div className="search-visual" aria-hidden="true">
-      <img
-        src={`${ASSET}${failed ? "not-found-rings.svg" : "search-rings.svg"}`}
-        alt=""
-      />
+    <div className={`search-visual${failed ? " is-failed" : " is-scanning"}`} aria-hidden="true">
+      {failed ? (
+        <img src={`${ASSET}not-found-rings.svg`} alt="" />
+      ) : (
+        [0, 1, 2].map((wave) => (
+          <span className={`search-wave search-wave-${wave}`} key={wave}>
+            <img src={`${ASSET}search-rings.svg`} alt="" />
+          </span>
+        ))
+      )}
+      {!failed && (
+        <span className="search-bluetooth">
+          <img src={`${ASSET}search-rings.svg`} alt="" />
+        </span>
+      )}
     </div>
   );
 }
@@ -269,7 +259,7 @@ function SearchScreen({ onBack, onHelp, onCancel, onFinished, attempt }) {
       <section className="search-content">
         <SearchVisual />
         <div className="search-copy">
-          <h1>Searching for Denon PerL 2</h1>
+          <h1>Searching for Denon buds</h1>
           <p>Please make sure your headphones are nearby with the case lid open.</p>
         </div>
       </section>
@@ -290,7 +280,7 @@ function NotFoundScreen({ onBack, onHelp }) {
       <section className="search-content">
         <SearchVisual failed />
         <div className="search-copy">
-          <h1>Denon PerL 2 not found</h1>
+          <h1>Denon buds not found</h1>
           <p>Please make sure your headphones are nearby with the case lid open.</p>
         </div>
       </section>
@@ -322,7 +312,7 @@ function HelpScreen({ onClose, onRetry }) {
           className="help-visual"
           src={`${ASSET}perl-2-pairing-animation.mp4`}
           poster={`${ASSET}pairing-help.png`}
-          label="Black Denon PerL 2 charging case entering pairing mode"
+          label="Black Denon buds charging case entering pairing mode"
         />
         <div className="help-copy">
           <h2>Press and hold the button</h2>
@@ -408,20 +398,20 @@ function SetupCard({ complete = false, onNext }) {
           className="setup-visual"
           src={`${ASSET}buds-moving-white-2.mp4`}
           poster={`${ASSET}setup-complete.png`}
-          label="Denon PerL 2 earbuds lifting from their charging case"
+          label="Denon buds lifting from their charging case"
         />
       ) : (
         <div className="setup-visual setup-placeholder">
           <img
             className="setup-placeholder-image"
             src={`${ASSET}preparing.png`}
-            alt="Denon PerL 2 preparing"
+            alt="Denon buds preparing"
           />
         </div>
       )}
       <div className="setup-copy">
-        <h1>{complete ? "Setup complete" : "Getting ready..."}</h1>
-        <p>{complete ? "Enjoy your headphones." : "Finishing up setup."}</p>
+        <h1>{complete ? "Denon buds connected" : "Getting ready..."}</h1>
+        <p>{complete ? "Tap Next to complete setup." : "Finishing up setup."}</p>
       </div>
       <button
         className="button button-primary setup-button"
@@ -447,7 +437,7 @@ function PairingPromptScreen({ onBack, onSelectAccessory }) {
       <section className="ios-alert" role="dialog" aria-modal="true" aria-labelledby="accessory-title">
         <h2 id="accessory-title">Select An Accessory</h2>
         <button className="ios-row accessory-row" onClick={onSelectAccessory}>
-          Denon PerL 2
+          Denon buds
         </button>
         <div className="ios-row" aria-hidden="true" />
         <div className="ios-row" aria-hidden="true" />
@@ -492,7 +482,7 @@ function FitBudsScreen({ onBack, onTryNow, onNext }) {
       <TopNavigation onBack={onBack} />
       <section className="fit-buds-content">
         <div className="fit-buds-visual">
-          <img src={`${ASSET}fit-buds-product.png`} alt="Denon PerL 2 earbuds and case" />
+        <img src={`${ASSET}fit-buds-product.png`} alt="Denon buds and case" />
         </div>
         <div className="fit-buds-copy">
           <h1>Finding the right fit</h1>
@@ -728,40 +718,37 @@ function FitTestScreen({ onBack, onNext, budsOut = false }) {
 }
 
 /* 11a-6 / 11a-8e — ear tip size. */
-function EarTipsScreen({ onBack, onDone, title }) {
+function EarTipsScreen({ onBack, onDone }) {
   const [selected, setSelected] = useState("Medium (Default)");
 
   return (
-    <main className="screen fit-screen">
+    <main className="screen ear-tip-screen">
       <TopNavigation onBack={onBack} title="What size is your ear tips?" />
-      <p className="fit-paragraph fit-paragraph-tight">
-        Select the eartip size you’re currently using. The default is set to Medium.
-      </p>
-      <ul className="ear-tip-list">
-        {EAR_TIP_OPTIONS.map((option) => (
-          <li key={option}>
+      <div className="ear-tip-size-visual" aria-hidden="true">
+        <video src={`${ASSET}tip-size.mp4`} autoPlay loop muted playsInline />
+      </div>
+      <div className="ear-tip-size-content">
+        <p className="ear-tip-size-copy">
+          Select the eartip size you’re currently using. The default is set to Medium.
+        </p>
+        <div className="ear-tip-grid" role="group" aria-label="Eartip size">
+          {EAR_TIP_OPTIONS.map((option) => (
             <button
-              className="ear-tip-row"
+              type="button"
+              className={`ear-tip-option${selected === option ? " is-selected" : ""}`}
               onClick={() => setSelected(option)}
               aria-pressed={selected === option}
+              key={option}
             >
-              <span>{option}</span>
-              {selected === option && (
-                <img
-                  className="ear-tip-check"
-                  src={FIGMA_EAR_TIP_CHECK}
-                  alt=""
-                  aria-hidden="true"
-                />
-              )}
+              {option}
             </button>
-          </li>
-        ))}
-      </ul>
-      <div className="fit-actions">
-        <button className="button button-primary" onClick={onDone}>Done</button>
+          ))}
+        </div>
       </div>
-      <HomeIndicator />
+      <div className="fit-test-rebuilt-bottom ear-tip-size-bottom">
+        <button className="button button-primary" onClick={onDone}>Next</button>
+        <div className="fit-test-rebuilt-home" aria-hidden="true" />
+      </div>
     </main>
   );
 }
@@ -1114,16 +1101,12 @@ function App() {
           />
         );
       case "fit-good":
-        return <FitGoodScreen onBack={goBack} onNext={() => pushScreen("ear-tips-final")} />;
+        return <FitGoodScreen onBack={goBack} onNext={() => pushScreen("ht-intro")} />;
       /* 11a-8e — last screen of the fit-test flow. Done hands over to the
          hearing-test flow, which starts at its own intro screen. */
       case "ear-tips-final":
         return (
-          <EarTipsScreen
-            onBack={goBack}
-            onDone={() => pushScreen("ht-intro")}
-            title="What size is your ear tips?"
-          />
+          <EarTipsScreen onBack={goBack} onDone={() => pushScreen("ht-intro")} />
         );
       case "fit-bad":
         return (

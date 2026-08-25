@@ -280,10 +280,11 @@ export function HtDeviceSetup({ go, back }) {
    control in the header. Each round: hold while the beep plays, release when
    it stops. */
 const PRACTICE_ROUNDS = 5;
+const PRACTICE_TONES = [500, 1000, 2000, 4000, 8000];
 
 export function HtPractice({ go, startComplete = false }) {
   const { config } = useFlow();
-  const { playBeep } = useBeepTrial();
+  const { startContinuousBeep } = useBeepTrial();
   /* start → waiting → beeping → success|fail → … → complete */
   const [phase, setPhase] = useState(startComplete ? "complete" : "start");
   const [done, setDone] = useState(startComplete ? PRACTICE_ROUNDS : 0);
@@ -294,26 +295,38 @@ export function HtPractice({ go, startComplete = false }) {
   const [pressed, setPressed] = useState(false);
   const pressedRef = useRef(false);
   const cancelled = useRef(false);
+  const stopBeepRef = useRef(null);
+  const hearBeepRef = useRef(null);
 
   useEffect(() => {
     cancelled.current = false;
     return () => {
       cancelled.current = true;
+      stopBeepRef.current?.();
+      hearBeepRef.current?.();
     };
   }, []);
 
   async function runRound() {
     setPhase("waiting");
-    await new Promise((r) => setTimeout(r, 1200 + Math.random() * 1400));
+    await new Promise((r) => setTimeout(r, 700 + Math.random() * 700));
     if (cancelled.current) return;
 
     setPhase("beeping");
     let heard = false;
-    const poll = window.setInterval(() => {
-      if (pressedRef.current) heard = true;
-    }, 50);
-    await playBeep(1000, 1);
-    window.clearInterval(poll);
+    stopBeepRef.current = startContinuousBeep(
+      PRACTICE_TONES[doneRef.current % PRACTICE_TONES.length],
+      1
+    );
+    await new Promise((resolve) => {
+      hearBeepRef.current = () => {
+        heard = true;
+        stopBeepRef.current?.();
+        stopBeepRef.current = null;
+        resolve();
+      };
+    });
+    hearBeepRef.current = null;
     if (cancelled.current) return;
 
     const ok =
@@ -366,7 +379,7 @@ export function HtPractice({ go, startComplete = false }) {
   const instruction = starting
     ? "Before we start the test, try this practice round"
     : phase === "beeping" && pressed
-    ? "Release the button when you stop hearing the beep"
+    ? "Release the button when you stop hearing the tone"
     : phase === "fail"
     ? "Keep the button pressed"
     : phase === "success"
@@ -395,13 +408,15 @@ export function HtPractice({ go, startComplete = false }) {
             }
             pressedRef.current = true;
             setPressed(true);
+            if (phase === "beeping") stopBeepRef.current?.(1200);
           }}
           onPressOut={() => {
+            if (phase === "beeping" && pressedRef.current) hearBeepRef.current?.();
             pressedRef.current = false;
             setPressed(false);
           }}
           pressed={pressed}
-          label={starting ? "Start" : undefined}
+          label={starting ? "Start" : phase === "beeping" ? "I hear the beep" : undefined}
         />
       </div>
     </main>
@@ -412,7 +427,7 @@ export function HtPractice({ go, startComplete = false }) {
 export function HtEarTest({ ear, go, startPaused = false, startNoise = null }) {
   const earName = ear === "right" ? "Right ear" : "Left ear";
   const { setEarResult, setLastTestDate } = useTest();
-  const { playBeep } = useBeepTrial();
+  const { startContinuousBeep } = useBeepTrial();
 
   const [phase, setPhase] = useState("countdown");
   const [count, setCount] = useState(3);
@@ -430,6 +445,9 @@ export function HtEarTest({ ear, go, startPaused = false, startNoise = null }) {
   const pressedRef = useRef(false);
   const cancelled = useRef(false);
   const pausedRef = useRef(false);
+  const toneActiveRef = useRef(false);
+  const stopToneRef = useRef(null);
+  const releaseToneRef = useRef(null);
 
   /* Holds the sequence between trials while paused, so a tone is never cut
      off mid-playback. */
@@ -467,18 +485,29 @@ export function HtEarTest({ ear, go, startPaused = false, startNoise = null }) {
         setTrialIdx(i);
         await waitWhilePaused();
         if (cancelled.current) return;
-        await new Promise((r) => setTimeout(r, 1000 + Math.random() * 2000));
-        if (cancelled.current) return;
-        let heardThis = false;
-        const poll = window.setInterval(() => {
-          if (pressedRef.current) heardThis = true;
-        }, 50);
-        await playBeep(TRIALS[i].freq, TRIALS[i].volume);
-        window.clearInterval(poll);
+        /* Start each trial as soon as the previous button release has
+           completed. There is no extra silent window between tones. */
+        stopToneRef.current?.(0);
+        stopToneRef.current = null;
+        toneActiveRef.current = true;
+        /* Keep the committed hearing-test tone sequence, while using the
+           practice interaction: fade the current trial on press, then advance
+           to the next frequency/level on release. */
+        stopToneRef.current = startContinuousBeep(TRIALS[i].freq, TRIALS[i].volume);
+        const heardThis = await new Promise((resolve) => {
+          releaseToneRef.current = () => {
+            toneActiveRef.current = false;
+            stopToneRef.current = null;
+            releaseToneRef.current = null;
+            resolve(true);
+          };
+        });
         if (cancelled.current) return;
         heard.push(heardThis);
       }
 
+      stopToneRef.current?.(0);
+      stopToneRef.current = null;
       setEarResult(ear === "right" ? "right" : "left", scoreFromHeard(heard));
       setPhase("done");
       if (ear === "right") {
@@ -492,6 +521,9 @@ export function HtEarTest({ ear, go, startPaused = false, startNoise = null }) {
     run();
     return () => {
       cancelled.current = true;
+      toneActiveRef.current = false;
+      stopToneRef.current?.();
+      releaseToneRef.current?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ear, runKey]);
@@ -535,8 +567,15 @@ export function HtEarTest({ ear, go, startPaused = false, startNoise = null }) {
           onPressIn={() => {
             pressedRef.current = true;
             setPressed(true);
+            if (toneActiveRef.current) {
+              stopToneRef.current?.(1200);
+            }
           }}
           onPressOut={() => {
+            if (toneActiveRef.current) {
+              stopToneRef.current?.();
+              releaseToneRef.current?.();
+            }
             pressedRef.current = false;
             setPressed(false);
           }}
@@ -803,8 +842,38 @@ export function HtProfile({ go, exit }) {
     reset,
   } = useTest();
   const [playing, setPlaying] = useState(false);
+  const audioRef = useRef(null);
   const [vizToast, setVizToast] = useState(null);
   const longPress = useRef(null);
+  const presetVolume = { softer: 0.45, recommended: 0.75, richer: 1 };
+  const previewVolume = () =>
+    presetVolume[preset] * (personalizationOn ? 1 : 0.55);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = previewVolume();
+  }, [preset, personalizationOn]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      audioRef.current = null;
+    };
+  }, []);
+
+  const togglePlaying = () => {
+    if (playing) {
+      audioRef.current?.pause();
+      setPlaying(false);
+      return;
+    }
+    const audio = new Audio(`${ASSET}fit-test-tone.mp4`);
+    audio.loop = true;
+    audio.volume = previewVolume();
+    audio.addEventListener("ended", () => setPlaying(false));
+    audioRef.current = audio;
+    audio.play().catch(() => setPlaying(false));
+    setPlaying(true);
+  };
 
   /* Hidden research toggle: long-press the "Profile" tab to switch between the
      Threads and Capsule visualizations. Not visible to participants. */
@@ -882,7 +951,7 @@ export function HtProfile({ go, exit }) {
           </div>
         </div>
 
-        <button type="button" className="ht-play-bar" onClick={() => setPlaying(!playing)}>
+        <button type="button" className="ht-play-bar" onClick={togglePlaying}>
           <span className="ht-play-copy">
             <span className="ht-play-title">Hear the difference</span>
             <span className="ht-play-sub">{playing ? "Tap to pause" : "Tap to play"}</span>
