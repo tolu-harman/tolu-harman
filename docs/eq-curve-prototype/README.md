@@ -15,9 +15,11 @@ It's a plain static site: no build step, no server code, no dependencies to inst
 | `index.html` | The page |
 | `styles.css` | All styling |
 | `app.js` | All behaviour (dragging, presets, option switching) |
+| `figma-sheet-background.svg` | Action Sheet header background |
+| `figma-back-arrow.svg` | Navigation arrow used in the header |
 | `favicon.svg` | Browser tab icon |
 
-Keep the four files together in the same folder.
+Keep the referenced files together in the same folder.
 
 ## Put it online
 

@@ -1,5 +1,5 @@
 /* base reset (normally supplied by the artifact host) */
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{box-sizing:border-box}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 img{max-width:100%}
@@ -62,16 +62,14 @@ body{background:var(--ground);color:var(--ground-ink);font-family:var(--font-ui)
   box-shadow:0 0 0 1px var(--bezel-edge),0 0 0 9px var(--bezel),0 0 0 10px var(--bezel-edge),0 32px 80px var(--phone-shadow);
   user-select:none;-webkit-user-select:none;font-feature-settings:"tnum" 1}
 .abs{position:absolute}
-.notch{left:109.5px;top:-2px;width:156px;height:33px;background:#000;border-radius:0 0 21px 21px}
-.time{left:25px;top:14px;width:54px;text-align:center;font:600 17px/22px var(--font-ui);letter-spacing:-.4px;color:var(--white)}
-.sb-right{right:25px;top:18px;display:flex;gap:6px;align-items:center}
-/* sheet header from the board: black status area, a sheet peeking behind, the EQ sheet from 52pt */
-.sheet-back{left:16px;width:343px;top:42px;height:20px;border-radius:10px 10px 0 0;background:var(--dark-grey)}
+/* Header background and title row follow the referenced Action Sheet frame. */
 .sheet{left:0;right:0;top:52px;bottom:0;border-radius:12px 12px 0 0;background:var(--darkest)}
-.titlebar{left:0;top:66px;width:375px;height:32px;display:flex;align-items:center;padding:0 24px;box-sizing:border-box}
-.titlebar h2{flex:1;margin:0;text-align:center;font:400 17px/24px var(--font-app);color:var(--light-grey)}
+.sheet-bg{left:0;top:0;z-index:1;pointer-events:none}
+.titlebar{left:0;top:66px;width:375px;height:32px;display:grid;grid-template-columns:24px minmax(0,1fr) 24px;align-items:center;padding:0 24px;box-sizing:border-box;background:var(--dark-grey);z-index:2}
+.title-arrow{display:block;width:24px;height:24px;object-fit:contain}
+.titlebar h2{min-width:0;margin:0;text-align:center;font:400 17px/24px var(--font-app);color:var(--light-grey)}
 /* press and hold the title to switch board option */
-.eq-title{flex:none!important;margin:0 auto!important;padding:4px 10px;border-radius:8px;cursor:pointer;outline:none;touch-action:manipulation;
+.eq-title{padding:4px 0;border-radius:8px;cursor:pointer;outline:none;touch-action:manipulation;
   -webkit-touch-callout:none;transition:opacity .2s,transform .2s cubic-bezier(.2,.8,.2,1),background .2s}
 .eq-title.holding{opacity:.55;transform:scale(.96)}
 .eq-title:focus-visible{background:rgba(214,214,217,.08)}
@@ -98,7 +96,7 @@ body{background:var(--ground);color:var(--ground-ink);font-family:var(--font-ui)
 
 /* graph card: static grid in SVG, moving curve on canvas, labels and handle in HTML */
 .card{left:16px;top:172px;width:343px;height:440px;border-radius:14px;overflow:hidden;touch-action:none}
-.card svg,.card canvas{position:absolute;left:0;top:0;width:343px;height:440px;display:block}
+.card svg,.card canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 .surface{fill:var(--almost-black);fill-opacity:.55;stroke:var(--white);stroke-opacity:.04}
 .grid-line{stroke:var(--light-grey);stroke-opacity:.07;stroke-dasharray:2 4}
 .grid-half{stroke:var(--light-grey);stroke-opacity:.035;stroke-dasharray:1 5}
@@ -110,10 +108,10 @@ body{background:var(--ground);color:var(--ground-ink);font-family:var(--font-ui)
 .val.sel{color:var(--gold)}
 .val.bump{animation:bump .22s cubic-bezier(.2,.8,.2,1)}
 @keyframes bump{from{transform:translateY(-2px);opacity:.7}to{transform:none;opacity:1}}
-.freq{top:376px;height:12px;text-align:center;font:500 10px/12px var(--font-app);letter-spacing:.4px;color:rgba(255,255,255,.88);transition:color .25s}
+.freq{top:calc(100% - 64px);height:12px;text-align:center;font:500 10px/12px var(--font-app);letter-spacing:.4px;color:rgba(255,255,255,.88);transition:color .25s}
 .freq.sel{color:var(--gold)}
-.bracket{top:398px;height:4px;box-sizing:border-box;border:1px solid rgba(214,214,217,.22);border-top:0}
-.zone{top:408px;text-align:center;font:500 9px/12px var(--font-app);letter-spacing:2px;text-transform:uppercase;color:rgba(214,214,217,.5)}
+.bracket{top:calc(100% - 42px);height:4px;box-sizing:border-box;border:1px solid rgba(214,214,217,.22);border-top:0}
+.zone{top:calc(100% - 32px);text-align:center;font:500 9px/12px var(--font-app);letter-spacing:2px;text-transform:uppercase;color:rgba(214,214,217,.5)}
 /* active-state grabber (EQ/Grabber in Figma): gold knob, gold halo, value badge above */
 .grab-pos{left:0;top:0;width:0;height:0;pointer-events:none;will-change:transform,opacity}
 .grab-knob{position:absolute;left:-13px;top:-13px;width:26px;height:26px;border-radius:50%;background:var(--gold);
@@ -123,7 +121,7 @@ body{background:var(--ground);color:var(--ground-ink);font-family:var(--font-ui)
   background:var(--dark-grey);border:1px solid rgba(246,197,123,.7);box-shadow:0 4px 10px rgba(0,0,0,.35);
   color:var(--white);font:600 13px/16px var(--font-ui);letter-spacing:-.2px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
 .badge.below{bottom:auto;top:22px}
-.hit{top:0;height:392px;cursor:ns-resize;touch-action:none;border-radius:10px;outline:none}
+.hit{top:0;height:calc(100% - 48px);cursor:ns-resize;touch-action:none;border-radius:10px;outline:none}
 .phone.kbd .hit:focus,.phone.kbd .hit3:focus{box-shadow:inset 0 0 0 1.5px rgba(246,197,123,.55)}
 
 /* Option 3: slim faders (D on the board), laid out in phone coordinates */
@@ -184,9 +182,29 @@ kbd{font:500 12px/1 var(--font-ui);padding:3px 6px;border-radius:5px;border:1px 
   *{transition:none!important;animation:none!important}
 }
 
-/* Pages presentation: show only the app, scaled to the largest portrait size that fits. */
-html,body{width:100%;height:100%;overflow:hidden}
+/* Pages presentation: keep only the app visible and fit it to the available viewport. */
+html,body{width:100%;height:100%;min-height:100dvh;overflow:hidden}
 body{padding:0;background:#000}
-.page{position:fixed;inset:0;display:block;width:100vw;height:100vh;min-height:0;padding:0;background:#000;overflow:hidden}
+.page{position:fixed;inset:0;display:block;width:100vw;height:100vh;height:100dvh;min-height:0;padding:0;background:#000;overflow:hidden}
 .stage{position:absolute;inset:0;width:100%;height:100%;margin:0}
 .phone{left:0;top:0;border-radius:0;box-shadow:none}
+
+/* In landscape, reflow the mobile controls into a wide full-screen layout instead of shrinking the portrait view. */
+.phone.wide{border-radius:0;box-shadow:none}
+.phone.wide .sheet-bg{left:50%;transform:translateX(-50%)}
+.phone.wide .sheet{border-radius:12px 12px 0 0}
+.phone.wide .titlebar{width:100%}
+.phone.wide .tags{left:24px;top:110px;transform:none}
+.phone.wide .card{left:16px;right:16px;top:152px;bottom:20px;width:auto;height:auto}
+.phone.wide .freq{top:calc(100% - 64px)}
+.phone.wide .bracket{top:calc(100% - 42px)}
+.phone.wide .zone{top:calc(100% - 32px)}
+.phone.wide .faders{width:100%;height:100%}
+.phone.wide .edit-row{left:auto;right:24px;top:104px;bottom:auto;width:220px;height:40px}
+.phone.wide .manage{left:auto;right:24px;top:104px;bottom:auto;width:min(200px,calc(100% - 48px));height:40px;transform:none}
+.phone.wide.modified .manage{display:none}
+.phone.wide.modified .edit-row{opacity:1;transform:none;pointer-events:auto}
+.phone.wide .home{left:50%;bottom:6px;transform:translateX(-50%)}
+.phone.wide .menu-scrim{width:100%;height:100%}
+.phone.wide .opt-menu{left:50%;transform:translate(-50%,-4px) scale(.92)}
+.phone.wide .opt-menu.open{transform:translateX(-50%)}

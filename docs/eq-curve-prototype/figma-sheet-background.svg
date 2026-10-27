@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="375" height="65.9986" viewBox="0 0 375 65.9986" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Bckg">
+<path id="Shape/Background" d="M16 52C16 46.4772 20.4772 42 26 42H349C354.523 42 359 46.4772 359 52V52H16V52Z" fill="#2D2E36"/>
+<path id="Background" d="M375 0H0V65.9985C0 62.2772 0 60.4162 0.489258 58.9102C1.47844 55.8658 3.86578 53.4784 6.91016 52.4893C8.41622 52 10.2772 52 13.9985 52H14H16C16 46.4772 20.4772 42 26 42H349C354.523 42 359 46.4772 359 52H361H361.001C364.723 52 366.584 52 368.09 52.4893C371.134 53.4784 373.522 55.8658 374.511 58.9102C375 60.4162 375 62.2773 375 65.9986V0Z" fill-rule="evenodd" clip-rule="evenodd" fill="black"/>
+</g>
+</svg>

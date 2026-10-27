@@ -9,7 +9,7 @@
   const LABEL = { 'true-sound': 'True sound', custom: 'Custom', classical: 'Classical' };
   const KEY = 'perl2-eq-custom';
   const ZONES = [['Lo',0,2],['Mid',3,6],['Hi',7,9]];
-  const CW = 343, CH = 440, PT = 60, PB = 356, MID = (PT+PB)/2, PER = (PB-PT)/12;
+  let CW = 343, CH = 440, PT = 60, PB = 356, MID = (PT+PB)/2, PER = (PB-PT)/12;
   // Option 1 (B2 on the board) keeps the +6 / 0 / −6 scale; Option 2 (B3) drops it and widens the plot
   const LAYOUTS = {
     'option-1': { PL: 28, PR: 335, scale: true },
@@ -18,7 +18,7 @@
   };
   let layout = 'option-1', PL = 28, PR = 335, COL = (PR - PL) / 10;
   // Option 3 geometry, in phone coordinates (from the board): 33.5pt columns from x=20, 0 dB at y=385.67, 25.17pt per dB
-  const F = { L: 20, W: 33.5, Z: 385.67, P: 302 / 12 };
+  let F = { L: 20, W: 33.5, Z: 385.67, P: 302 / 12 };
   const isF = () => layout === 'option-3';
   const X3 = i => F.L + F.W * (i + 0.5), Y3 = g => F.Z - g * F.P;
   const X = i => isF() ? X3(i) : PL + COL*(i+0.5), Y = g => MID - g*PER;
@@ -75,7 +75,8 @@
   const ctx = cv.getContext('2d');
   let dpr = 1;
   const sizeCanvas = () => {
-    dpr = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
+    const requestedDpr = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
+    dpr = Math.min(requestedDpr, Math.sqrt(8_000_000 / (CW * CH)));
     cv.width = Math.round(CW * dpr); cv.height = Math.round(CH * dpr);
   };
   sizeCanvas();
@@ -111,21 +112,23 @@
   // ---------- Option 3: slim faders ----------
   const faders = document.getElementById('faders');
   const fdiv = (cls, style = '', text = '') => { const d = document.createElement('div'); d.className = cls; if (style) d.setAttribute('style', style); d.textContent = text; faders.appendChild(d); return d; };
-  for (let d = 6; d >= -6; d--) fdiv('f-grid', `left:${X3(0)}px;width:${X3(9) - X3(0)}px;top:${Y3(d) - 0.5}px`);
-  BANDS.forEach((_, i) => fdiv('f-track', `left:${X3(i) - 4}px`));
-  const fills3 = BANDS.map((_, i) => fdiv('f-fill', `left:${X3(i) - 4}px;height:0`));
+  const grid3 = [];
+  for (let d = 6; d >= -6; d--) grid3.push({ db:d, el:fdiv('f-grid') });
+  const tracks3 = BANDS.map(() => fdiv('f-track'));
+  const fills3 = BANDS.map(() => fdiv('f-fill'));
   const handles3 = BANDS.map(() => fdiv('f-handle'));
-  const vals3 = BANDS.map((_, i) => fdiv('f-val', `left:${F.L + F.W * i}px`));
-  BANDS.forEach((b, i) => fdiv('f-freq', `left:${F.L + F.W * i}px`, b));
-  for (const [name, l, w] of [['Lo', 24.19, 92.13], ['Mid', 124.69, 125.63], ['Hi', 258.69, 92.13]]) {
-    fdiv('f-bracket', `left:${l}px;width:${w}px`);
-    fdiv('f-group', `left:${l}px;width:${w}px`, name);
+  const vals3 = BANDS.map(() => fdiv('f-val'));
+  const freqs3 = BANDS.map(b => fdiv('f-freq', '', b));
+  const brackets3 = [], groups3 = [];
+  for (const name of ['Lo','Mid','Hi']) {
+    brackets3.push(fdiv('f-bracket'));
+    groups3.push(fdiv('f-group', '', name));
   }
   const grab3 = fdiv('g3');
   grab3.innerHTML = '<div class="g3-halo"></div><div class="g3-knob"></div><div class="g3-bubble" aria-hidden="true"></div>';
   const knob3 = grab3.querySelector('.g3-knob'), bubble3 = grab3.querySelector('.g3-bubble');
   const hits3 = BANDS.map((_, i) => {
-    const h = fdiv('hit3', `left:${F.L + F.W * i}px`);
+    const h = fdiv('hit3');
     h.tabIndex = 0;
     h.setAttribute('role', 'slider');
     h.setAttribute('aria-label', NAMES[i]);
@@ -135,6 +138,22 @@
   const curHits = () => isF() ? hits3 : hits;
   const curKnob = () => isF() ? knob3 : knob;
   const curPer = () => isF() ? F.P : PER;
+
+  function reflowFaders(wide) {
+    const cardTop = wide ? 152 : 172;
+    const trackTop = F.Z - 6 * F.P - 4;
+    const trackHeight = 12 * F.P + 8;
+    const xLeft = X3(0), xRight = X3(9), groupWidths = [2.75,3.75,2.75];
+    grid3.forEach(({db, el}) => { el.style.left = `${xLeft}px`; el.style.width = `${xRight - xLeft}px`; el.style.top = `${Y3(db) - 0.5}px`; });
+    tracks3.forEach((el, i) => { el.style.left = `${X3(i) - 4}px`; el.style.top = `${trackTop}px`; el.style.height = `${trackHeight}px`; });
+    fills3.forEach((el, i) => { el.style.left = `${X3(i) - 4}px`; });
+    vals3.forEach((el, i) => { el.style.left = `${F.L + F.W * i}px`; el.style.width = `${F.W}px`; el.style.top = `${trackTop - 33.58}px`; });
+    freqs3.forEach((el, i) => { el.style.left = `${F.L + F.W * i}px`; el.style.width = `${F.W}px`; el.style.top = `${cardTop + CH - 52}px`; });
+    const groupLefts = [F.L + 0.125*F.W, F.L + 3.125*F.W, F.L + 7.125*F.W];
+    brackets3.forEach((el, i) => { el.style.left = `${groupLefts[i]}px`; el.style.width = `${groupWidths[i]*F.W}px`; el.style.top = `${cardTop + CH - 18.14}px`; });
+    groups3.forEach((el, i) => { el.style.left = `${groupLefts[i]}px`; el.style.width = `${groupWidths[i]*F.W}px`; el.style.top = `${cardTop + CH - 7.14}px`; });
+    hits3.forEach((el, i) => { el.style.left = `${F.L + F.W * i}px`; el.style.width = `${F.W}px`; el.style.top = `${cardTop + 15}px`; el.style.height = `${Math.max(24, CH - 48)}px`; });
+  }
 
   // ---------- curve shape ----------
   // Shape-preserving cubic (PCHIP): peaks and dips stay rounded and sit exactly on each point, with no overshoot.
@@ -276,6 +295,7 @@
     [...hits, ...hits3].forEach((h, k) => { const i = k % 10; h.setAttribute('aria-valuenow', gains[i]); h.setAttribute('aria-valuetext', `${fmt(gains[i])} dB`); });
     const m = modified();
     editRow.classList.toggle('show', m); editRow.inert = !m;
+    phoneEl.classList.toggle('modified', m);
     document.querySelectorAll('.tag').forEach(t => t.setAttribute('aria-pressed', String(t.dataset.preset === active)));
     if (readout) readout.innerHTML = `${NAMES[sel]} · ${fmt(gains[sel])} dB <span>· ${LABEL[active]}${m ? ', edited' : ''}</span>`;
   }
@@ -351,8 +371,8 @@
       if (!drag || drag.id !== e.pointerId) return;
       if (!drag.moved && Math.abs(e.clientY - drag.y0) < 2) return;
       if (!drag.moved) { drag.moved = true; curKnob().classList.add('dragging'); }
-      const scale = phoneEl.getBoundingClientRect().width / 375;   // the phone mock may be scaled to fit the window
-      let raw = drag.g0 - (e.clientY - drag.y0) / (scale * curPer());
+      const scaleY = phoneEl.classList.contains('wide') ? 1 : phoneEl.getBoundingClientRect().height / 812;
+      let raw = drag.g0 - (e.clientY - drag.y0) / (scaleY * curPer());
       // past ±6 dB it eases off like a soft end stop
       if (raw > 6) raw = 6 + (1 - Math.exp(-(raw - 6) * 0.6)) * 0.35;
       if (raw < -6) raw = -6 - (1 - Math.exp((raw + 6) * 0.6)) * 0.35;
@@ -411,14 +431,61 @@
   const phone = document.getElementById('phone');
   addEventListener('keydown', e => { if (e.key === 'Tab' || e.key.startsWith('Arrow')) phone.classList.add('kbd'); });
   addEventListener('pointerdown', () => phone.classList.remove('kbd'), true);
+  function syncGeometry(wide) {
+    if (wide) {
+      CW = Math.max(1, phoneEl.clientWidth - 32);
+      CH = Math.max(80, phoneEl.clientHeight - 172);
+      PT = Math.min(60, Math.max(32, CH * 0.28));
+      PB = Math.max(PT + 36, CH - 68);
+      const option = layout === 'option-2' ? 'option-2' : 'option-1';
+      PL = CW * LAYOUTS[option].PL / 343;
+      PR = CW * LAYOUTS[option].PR / 343;
+      F = { L:20, W:(phoneEl.clientWidth - 40) / 10, Z:152 + (PT + PB) / 2, P:(PB - PT) / 12 };
+    } else {
+      CW = 343; CH = 440; PT = 60; PB = 356;
+      if (layout !== 'option-3') { PL = LAYOUTS[layout].PL; PR = LAYOUTS[layout].PR; }
+      F = { L:20, W:33.5, Z:385.67, P:302 / 12 };
+    }
+    MID = (PT + PB) / 2;
+    PER = (PB - PT) / 12;
+    COL = (PR - PL) / 10;
+    if (layout !== 'option-3') {
+      card.querySelector('svg').outerHTML = staticSvg();
+      place();
+    }
+    selX.x = selX.t = X(sel); selX.v = 0;
+    reflowFaders(wide);
+    sizeCanvas();
+    draw();
+  }
   function fit() {
-    const availW = document.documentElement.clientWidth;
-    const availH = document.documentElement.clientHeight;
-    const s = Math.min(availW / 375, availH / 812);
-    phone.style.left = `${(availW - 375 * s) / 2}px`;
-    phone.style.top = `${(availH - 812 * s) / 2}px`;
-    phone.style.transform = `scale(${s})`;
-    sizeCanvas(); draw();
+    const viewport = window.visualViewport;
+    const root = document.documentElement;
+    const visualW = viewport ? viewport.width : 0;
+    const visualH = viewport ? viewport.height : 0;
+    const availW = visualW > 0 ? visualW : root.clientWidth || window.innerWidth;
+    const availH = visualH > 0 ? visualH : root.clientHeight || window.innerHeight;
+    const offsetX = visualW > 0 ? viewport.offsetLeft : 0;
+    const offsetY = visualH > 0 ? viewport.offsetTop : 0;
+    const wide = availW > availH;
+    if (wide) {
+      phone.classList.add('wide');
+      phone.style.width = `${availW}px`;
+      phone.style.height = `${availH}px`;
+      phone.style.left = `${offsetX}px`;
+      phone.style.top = `${offsetY}px`;
+      phone.style.transform = 'none';
+    } else {
+      phone.classList.remove('wide');
+      phone.style.width = '';
+      phone.style.height = '';
+      const s = Math.min(availW / 375, availH / 812);
+      if (!Number.isFinite(s) || s <= 0) return;
+      phone.style.left = `${offsetX + (availW - 375 * s) / 2}px`;
+      phone.style.top = `${offsetY + (availH - 812 * s) / 2}px`;
+      phone.style.transform = `scale(${s})`;
+    }
+    syncGeometry(wide);
   }
   // ---------- version picker (Options 1–3 on the board) ----------
   const LAYOUT_KEY = 'perl2-eq-layout';
@@ -428,7 +495,10 @@
     layout = name;
     const L = LAYOUTS[name];
     if (!L.faders) {
-      PL = L.PL; PR = L.PR; COL = (PR - PL) / 10;
+      if (phoneEl.classList.contains('wide')) {
+        PL = CW * L.PL / 343; PR = CW * L.PR / 343;
+      } else { PL = L.PL; PR = L.PR; }
+      COL = (PR - PL) / 10;
       card.querySelector('svg').outerHTML = staticSvg();
       place();
     }
@@ -440,6 +510,7 @@
     switches.forEach(b => b.setAttribute('aria-checked', String(b.dataset.layout === name)));
     if (save) { try { localStorage.setItem(LAYOUT_KEY, name); } catch (e) {} }
     if (location.hash !== '#' + name) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
+    reflowFaders(phoneEl.classList.contains('wide'));
     draw();
   }
   switches.forEach(b => b.addEventListener('click', () => applyLayout(b.dataset.layout)));
@@ -490,7 +561,11 @@
   if (!LAYOUTS[initial]) { try { initial = localStorage.getItem(LAYOUT_KEY) || 'option-1'; } catch (e) { initial = 'option-1'; } }
   applyLayout(initial, false);
 
-  addEventListener('resize', fit);
+  addEventListener('resize', fit, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', fit, { passive: true });
+    window.visualViewport.addEventListener('scroll', fit, { passive: true });
+  }
   fit();
   labels(); draw();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
