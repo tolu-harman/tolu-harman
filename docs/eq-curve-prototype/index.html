@@ -14,14 +14,6 @@
 </head>
 <body>
 <main class="page">
-  <div class="picker">
-    <p class="picker-label" id="pickerLabel">Version</p>
-    <div class="switch" role="radiogroup" aria-labelledby="pickerLabel">
-      <button type="button" role="radio" id="opt-1" data-layout="option-1" aria-checked="true"><b>Option 1</b><span>Curve, dB scale</span></button>
-      <button type="button" role="radio" id="opt-2" data-layout="option-2" aria-checked="false"><b>Option 2</b><span>Curve, wider</span></button>
-      <button type="button" role="radio" id="opt-3" data-layout="option-3" aria-checked="false"><b>Option 3</b><span>Slim faders</span></button>
-    </div>
-  </div>
   <div class="stage" id="stage">
     <div class="phone" id="phone">
       <div class="abs sheet-back"></div>
@@ -72,21 +64,6 @@
       <div class="abs home"></div>
     </div>
   </div>
-
-  <aside class="notes">
-    <p class="eyebrow">PerL 2 app · Advanced EQ</p>
-    <h1>10-band curve</h1>
-    <p class="lede">Drag a band up or down to boost or cut it by up to 6&nbsp;dB. When the settings no longer match the preset, Save and Revert appear, as on the current 5-band screen.</p>
-    <ul class="keys">
-      <li>Drag a band <span>Set its gain</span></li>
-      <li>Double-tap a band <span>Back to 0 dB</span></li>
-      <li><span><kbd>↑</kbd> <kbd>↓</kbd></span> <span>Adjust 0.5 dB</span></li>
-      <li><span><kbd>←</kbd> <kbd>→</kbd></span> <span>Next band</span></li>
-      <li>Hold “Advanced EQ” <span>Switch option</span></li>
-    </ul>
-    <p class="readout" id="readout"></p>
-    <button class="reset" id="resetAll">Reset prototype</button>
-  </aside>
 </main>
 
 <script src="app.js"></script>

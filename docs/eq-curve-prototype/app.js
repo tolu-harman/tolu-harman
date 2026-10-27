@@ -277,7 +277,7 @@
     const m = modified();
     editRow.classList.toggle('show', m); editRow.inert = !m;
     document.querySelectorAll('.tag').forEach(t => t.setAttribute('aria-pressed', String(t.dataset.preset === active)));
-    readout.innerHTML = `${NAMES[sel]} · ${fmt(gains[sel])} dB <span>· ${LABEL[active]}${m ? ', edited' : ''}</span>`;
+    if (readout) readout.innerHTML = `${NAMES[sel]} · ${fmt(gains[sel])} dB <span>· ${LABEL[active]}${m ? ', edited' : ''}</span>`;
   }
   const bump = i => { const v = vals[i]; v.classList.remove('bump'); void v.offsetWidth; v.classList.add('bump'); };
 
@@ -401,23 +401,21 @@
   });
   document.getElementById('revertBtn').addEventListener('click', () => { loadPreset(presets[active]); toast(`Reverted to ${LABEL[active]}`); });
   document.getElementById('manageBtn').addEventListener('click', () => toast('Manage preset isn’t part of this prototype'));
-  document.getElementById('resetAll').addEventListener('click', () => {
+  document.getElementById('resetAll')?.addEventListener('click', () => {
     presets = JSON.parse(JSON.stringify(DEFAULTS));
     try { localStorage.removeItem(KEY); } catch (e) {}
     active = 'classical'; select(6); loadPreset(presets.classical);
   });
 
   // ---------- fit the phone to the window ----------
-  const stage = document.getElementById('stage'), phone = document.getElementById('phone');
+  const phone = document.getElementById('phone');
   addEventListener('keydown', e => { if (e.key === 'Tab' || e.key.startsWith('Arrow')) phone.classList.add('kbd'); });
   addEventListener('pointerdown', () => phone.classList.remove('kbd'), true);
   function fit() {
-    const narrow = innerWidth <= 760;
-    const availW = Math.min(375, document.documentElement.clientWidth - 32 - 20);
-    const availH = narrow ? Infinity : innerHeight - 56 - 20;
-    const s = Math.max(0.55, Math.min(1, availW / 375, availH / 812));
-    stage.style.width = 375 * s + 'px'; stage.style.height = 812 * s + 'px';
-    phone.style.transform = `scale(${s})`;
+    const availW = document.documentElement.clientWidth;
+    const availH = document.documentElement.clientHeight;
+    const s = Math.min(availW / 375, availH / 812);
+    phone.style.transform = `translate(-50%, -50%) scale(${s})`;
     sizeCanvas(); draw();
   }
   // ---------- version picker (Options 1–3 on the board) ----------
