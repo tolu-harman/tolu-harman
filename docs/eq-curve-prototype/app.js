@@ -64,7 +64,7 @@
     // a line for every dB from 0 to ±6, with fainter half-step lines between them
     for (let d = -5.5; d <= 5.5; d += 1) svg += `<line class="grid-half" x1="${PL}" x2="${PR}" y1="${Y(d)}" y2="${Y(d)}"/>`;
     for (let d = -6; d <= 6; d++) svg += `<line class="${d===0?'grid-zero':'grid-line'}" x1="${PL}" x2="${PR}" y1="${Y(d)}" y2="${Y(d)}"/>`;
-    if (LAYOUTS[layout].scale) for (const [d,l] of [[6,'+6'],[0,'0'],[-6,'−6']]) svg += `<text class="db" x="22" y="${Y(d)+3.5}" text-anchor="end">${l}</text>`;
+    if (LAYOUTS[layout].scale) for (const [d,l] of [[6,'+6'],[0,'0'],[-6,'−6']]) svg += `<text class="db" x="${Math.max(8, PL - 6)}" y="${Y(d)+3.5}" text-anchor="end">${l}</text>`;
     return svg + '</svg>';
   }
   card.innerHTML = staticSvg();
@@ -139,8 +139,8 @@
   const curKnob = () => isF() ? knob3 : knob;
   const curPer = () => isF() ? F.P : PER;
 
-  function reflowFaders(wide) {
-    const cardTop = wide ? 152 : 172;
+  function reflowFaders() {
+    const cardTop = card.offsetTop;
     const trackTop = F.Z - 6 * F.P - 4;
     const trackHeight = 12 * F.P + 8;
     const xLeft = X3(0), xRight = X3(9), groupWidths = [2.75,3.75,2.75];
@@ -371,8 +371,7 @@
       if (!drag || drag.id !== e.pointerId) return;
       if (!drag.moved && Math.abs(e.clientY - drag.y0) < 2) return;
       if (!drag.moved) { drag.moved = true; curKnob().classList.add('dragging'); }
-      const scaleY = phoneEl.classList.contains('wide') ? 1 : phoneEl.getBoundingClientRect().height / 812;
-      let raw = drag.g0 - (e.clientY - drag.y0) / (scaleY * curPer());
+      let raw = drag.g0 - (e.clientY - drag.y0) / curPer();
       // past ±6 dB it eases off like a soft end stop
       if (raw > 6) raw = 6 + (1 - Math.exp(-(raw - 6) * 0.6)) * 0.35;
       if (raw < -6) raw = -6 - (1 - Math.exp((raw + 6) * 0.6)) * 0.35;
@@ -432,29 +431,35 @@
   addEventListener('keydown', e => { if (e.key === 'Tab' || e.key.startsWith('Arrow')) phone.classList.add('kbd'); });
   addEventListener('pointerdown', () => phone.classList.remove('kbd'), true);
   function syncGeometry(wide) {
+    const phoneRect = phoneEl.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    CW = Math.max(1, card.clientWidth);
+    CH = Math.max(80, card.clientHeight);
     if (wide) {
-      CW = Math.max(1, phoneEl.clientWidth - 32);
-      CH = Math.max(80, phoneEl.clientHeight - 172);
       PT = Math.min(60, Math.max(32, CH * 0.28));
       PB = Math.max(PT + 36, CH - 68);
-      const option = layout === 'option-2' ? 'option-2' : 'option-1';
-      PL = CW * LAYOUTS[option].PL / 343;
-      PR = CW * LAYOUTS[option].PR / 343;
-      F = { L:20, W:(phoneEl.clientWidth - 40) / 10, Z:152 + (PT + PB) / 2, P:(PB - PT) / 12 };
     } else {
-      CW = 343; CH = 440; PT = 60; PB = 356;
-      if (layout !== 'option-3') { PL = LAYOUTS[layout].PL; PR = LAYOUTS[layout].PR; }
-      F = { L:20, W:33.5, Z:385.67, P:302 / 12 };
+      PT = Math.min(60, Math.max(40, CH * 0.136));
+      PB = Math.max(PT + 36, CH - 84);
     }
+    const option = layout === 'option-2' ? 'option-2' : 'option-1';
+    PL = CW * LAYOUTS[option].PL / 343;
+    PR = CW * LAYOUTS[option].PR / 343;
     MID = (PT + PB) / 2;
     PER = (PB - PT) / 12;
     COL = (PR - PL) / 10;
+    F = {
+      L: cardRect.left - phoneRect.left + 4,
+      W: Math.max(1, (CW - 8) / 10),
+      Z: cardRect.top - phoneRect.top + MID + 5.67,
+      P: (PB - PT + 6) / 12,
+    };
     if (layout !== 'option-3') {
       card.querySelector('svg').outerHTML = staticSvg();
       place();
     }
     selX.x = selX.t = X(sel); selX.v = 0;
-    reflowFaders(wide);
+    reflowFaders();
     sizeCanvas();
     draw();
   }
@@ -468,23 +473,12 @@
     const offsetX = visualW > 0 ? viewport.offsetLeft : 0;
     const offsetY = visualH > 0 ? viewport.offsetTop : 0;
     const wide = availW > availH;
-    if (wide) {
-      phone.classList.add('wide');
-      phone.style.width = `${availW}px`;
-      phone.style.height = `${availH}px`;
-      phone.style.left = `${offsetX}px`;
-      phone.style.top = `${offsetY}px`;
-      phone.style.transform = 'none';
-    } else {
-      phone.classList.remove('wide');
-      phone.style.width = '';
-      phone.style.height = '';
-      const s = Math.min(availW / 375, availH / 812);
-      if (!Number.isFinite(s) || s <= 0) return;
-      phone.style.left = `${offsetX + (availW - 375 * s) / 2}px`;
-      phone.style.top = `${offsetY + (availH - 812 * s) / 2}px`;
-      phone.style.transform = `scale(${s})`;
-    }
+    phone.classList.toggle('wide', wide);
+    phone.style.width = `${availW}px`;
+    phone.style.height = `${availH}px`;
+    phone.style.left = `${offsetX}px`;
+    phone.style.top = `${offsetY}px`;
+    phone.style.transform = 'none';
     syncGeometry(wide);
   }
   // ---------- version picker (Options 1–3 on the board) ----------
@@ -495,9 +489,8 @@
     layout = name;
     const L = LAYOUTS[name];
     if (!L.faders) {
-      if (phoneEl.classList.contains('wide')) {
-        PL = CW * L.PL / 343; PR = CW * L.PR / 343;
-      } else { PL = L.PL; PR = L.PR; }
+      PL = CW * L.PL / 343;
+      PR = CW * L.PR / 343;
       COL = (PR - PL) / 10;
       card.querySelector('svg').outerHTML = staticSvg();
       place();
@@ -510,7 +503,7 @@
     switches.forEach(b => b.setAttribute('aria-checked', String(b.dataset.layout === name)));
     if (save) { try { localStorage.setItem(LAYOUT_KEY, name); } catch (e) {} }
     if (location.hash !== '#' + name) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
-    reflowFaders(phoneEl.classList.contains('wide'));
+    reflowFaders();
     draw();
   }
   switches.forEach(b => b.addEventListener('click', () => applyLayout(b.dataset.layout)));

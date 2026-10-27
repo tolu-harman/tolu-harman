@@ -182,29 +182,33 @@ kbd{font:500 12px/1 var(--font-ui);padding:3px 6px;border-radius:5px;border:1px 
   *{transition:none!important;animation:none!important}
 }
 
-/* Pages presentation: keep only the app visible and fit it to the available viewport. */
-html,body{width:100%;height:100%;min-height:100dvh;overflow:hidden}
-body{padding:0;background:#000}
-.page{position:fixed;inset:0;display:block;width:100vw;height:100vh;height:100dvh;min-height:0;padding:0;background:#000;overflow:hidden}
+/* Full-screen Pages presentation. The app uses Safari's visible viewport directly,
+   rather than shrinking a fixed 375 × 812 phone mockup into it. */
+html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0;padding:0;background:#000}
+.page{position:fixed;inset:0;display:block;width:100%;height:100%;height:100dvh;min-height:0;padding:0;background:#000;overflow:hidden}
 .stage{position:absolute;inset:0;width:100%;height:100%;margin:0}
-.phone{left:0;top:0;border-radius:0;box-shadow:none}
+.phone{left:0;top:0;width:100%;height:100%;transform:none;border-radius:0;box-shadow:none;overflow:hidden}
+.sheet-bg{width:100%;height:66px;object-fit:fill}
+.titlebar{width:100%;padding-inline:clamp(16px,6.4vw,24px)}
+.tags{left:16px;right:16px;top:clamp(108px,15.3vh,124px);justify-content:center;gap:clamp(6px,3vw,12px)}
+.tag{padding-inline:clamp(8px,3.2vw,12px);font-size:clamp(11px,3.4vw,13px);white-space:nowrap}
+.card{left:16px;right:16px;top:clamp(148px,21.2vh,172px);bottom:calc(env(safe-area-inset-bottom,0px) + 53px + 48px + clamp(32px,12vh,99px));width:auto;height:auto;min-height:160px}
+.manage{left:24px;right:24px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 53px);width:auto}
+.edit-row{left:24px;right:24px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 53px + 48px + 20px);width:auto}
+.home{display:none}
+.menu-scrim{width:100%;height:100%}
+.opt-menu{left:50%;width:min(232px,calc(100% - 32px));transform:translate(-50%,-4px) scale(.92)}
+.opt-menu.open{transform:translateX(-50%)}
+.faders{width:100%;height:100%}
+/* Keep the graph's box measurable under Option 3; its SVG stays visually hidden. */
+.phone .card[hidden]{display:block!important;visibility:hidden!important;pointer-events:none}
 
-/* In landscape, reflow the mobile controls into a wide full-screen layout instead of shrinking the portrait view. */
-.phone.wide{border-radius:0;box-shadow:none}
-.phone.wide .sheet-bg{left:50%;transform:translateX(-50%)}
+/* In landscape, put the presets and action at the top and let the graph use the remaining height. */
 .phone.wide .sheet{border-radius:12px 12px 0 0}
-.phone.wide .titlebar{width:100%}
-.phone.wide .tags{left:24px;top:110px;transform:none}
-.phone.wide .card{left:16px;right:16px;top:152px;bottom:20px;width:auto;height:auto}
-.phone.wide .freq{top:calc(100% - 64px)}
-.phone.wide .bracket{top:calc(100% - 42px)}
-.phone.wide .zone{top:calc(100% - 32px)}
-.phone.wide .faders{width:100%;height:100%}
+.phone.wide .tags{left:24px;right:auto;top:110px;transform:none}
+.phone.wide .card{left:16px;right:16px;top:152px;bottom:20px;width:auto;height:auto;min-height:0}
 .phone.wide .edit-row{left:auto;right:24px;top:104px;bottom:auto;width:220px;height:40px}
 .phone.wide .manage{left:auto;right:24px;top:104px;bottom:auto;width:min(200px,calc(100% - 48px));height:40px;transform:none}
 .phone.wide.modified .manage{display:none}
 .phone.wide.modified .edit-row{opacity:1;transform:none;pointer-events:auto}
-.phone.wide .home{left:50%;bottom:6px;transform:translateX(-50%)}
-.phone.wide .menu-scrim{width:100%;height:100%}
-.phone.wide .opt-menu{left:50%;transform:translate(-50%,-4px) scale(.92)}
-.phone.wide .opt-menu.open{transform:translateX(-50%)}
