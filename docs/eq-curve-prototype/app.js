@@ -414,9 +414,9 @@
   function fit() {
     const availW = document.documentElement.clientWidth;
     const availH = document.documentElement.clientHeight;
-    const s = Math.min(availW / 375, availH / 760);
+    const s = Math.min(availW / 375, availH / 812);
     phone.style.left = `${(availW - 375 * s) / 2}px`;
-    phone.style.top = `${(availH - 760 * s) / 2}px`;
+    phone.style.top = `${(availH - 812 * s) / 2}px`;
     phone.style.transform = `scale(${s})`;
     sizeCanvas(); draw();
   }

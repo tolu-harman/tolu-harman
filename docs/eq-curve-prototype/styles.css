@@ -190,15 +190,3 @@ body{padding:0;background:#000}
 .page{position:fixed;inset:0;display:block;width:100vw;height:100vh;min-height:0;padding:0;background:#000;overflow:hidden}
 .stage{position:absolute;inset:0;width:100%;height:100%;margin:0}
 .phone{left:0;top:0;border-radius:0;box-shadow:none}
-.phone{height:760px}
-.sheet-back,.notch,.time,.sb-right{display:none}
-.sheet{top:0;border-radius:0}
-.titlebar{top:14px}
-.tags{top:72px}
-.card{top:120px}
-.faders{height:760px;transform:translateY(-52px)}
-.edit-row{top:589px}
-.manage{top:659px}
-.toast{top:38px}
-.menu-scrim{height:760px}
-.opt-menu{top:50px}
