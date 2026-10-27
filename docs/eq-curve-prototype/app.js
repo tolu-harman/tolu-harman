@@ -415,7 +415,9 @@
     const availW = document.documentElement.clientWidth;
     const availH = document.documentElement.clientHeight;
     const s = Math.min(availW / 375, availH / 812);
-    phone.style.transform = `translate(-50%, -50%) scale(${s})`;
+    phone.style.left = `${(availW - 375 * s) / 2}px`;
+    phone.style.top = `${(availH - 812 * s) / 2}px`;
+    phone.style.transform = `scale(${s})`;
     sizeCanvas(); draw();
   }
   // ---------- version picker (Options 1–3 on the board) ----------
